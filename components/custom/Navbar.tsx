@@ -13,6 +13,7 @@ import {
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import Link from 'next/link';
 
 
 const iconMap = {
@@ -78,21 +79,21 @@ const Navbar = () => {
     return (
         <div className='p-5 px-3 w-[250px] flex flex-col bg-[#101010] border-r border-[#ddd] border-opacity-20 justify-between h-full'>
             <div className="flex flex-col">
-                <div className="text-2xl px-2 py-5">
+                <Link href={"/"} className="text-2xl px-2 py-5 cursor-pointer">
                     Instagram
-                </div>
+                </Link>
                 <div className="flex flex-col gap-2 py-3">
                     {
                         mainOptions.map((opt, index) => {
                             return (
-                            <div key={index} className='flex gap-3 py-3 px-2 items-center rounded-lg cursor-pointer hover:bg-[#232323]'>
-                                <div className="text-[28px] w-[30px]">
-                                    {iconMap[opt.icon]}
-                                </div>
-                                <div className="">
-                                    {opt.title}
-                                </div>
-                            </div>)
+                                <Link href={`${opt.icon !== "search" ? opt.icon !== "home" ? opt.icon : "/" : "#"}`} key={index} className='flex gap-3 py-3 px-2 items-center rounded-lg cursor-pointer hover:bg-[#232323]'>
+                                    <div className="text-[28px] w-[30px]">
+                                        {iconMap[opt.icon]}
+                                    </div>
+                                    <div className="">
+                                        {opt.title}
+                                    </div>
+                                </Link>)
                         })
                     }
                 </div>
