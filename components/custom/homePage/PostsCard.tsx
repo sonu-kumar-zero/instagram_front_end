@@ -77,7 +77,7 @@ const PostsCard: React.FC<PostCardProps> = ({ url, videoPlaying, setVideoPlaying
                 <div className="flex gap-3 items-center">
                     <div className="w-[50px] flex flex-col items-center cursor-pointer relative">
                         <div className='absolute -z-10 right-[2px] -top-[3px]'>
-                            <ConicalRainbowCircle width={46} height={46} />
+                            {/* <ConicalRainbowCircle width={46} height={46} /> */}
                         </div>
                         <Image src={"/images/sonu_profile.jpeg"} width={40} height={40} alt='profile' className='rounded-full w-[40px] h-[40px] border-[3px] border-[#121212cc]' />
                     </div>

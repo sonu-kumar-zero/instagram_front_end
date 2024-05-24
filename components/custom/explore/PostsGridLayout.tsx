@@ -1,6 +1,7 @@
 "use client";
 import Image from 'next/image'
 import React from 'react'
+import PostsGridChild from './PostsGridChild';
 
 interface PostsGridLayoutProps {
   isLeftLayout: boolean,
@@ -17,19 +18,19 @@ const PostsGridLayout: React.FC<PostsGridLayoutProps> = ({ isLeftLayout, url1, u
     <div className='grid grid-cols-3 gap-1 grid-rows-2 w-full h-[80dvh]'>
       {
         isLeftLayout ?
-          <Image src={url1} alt='post' width={500} height={1000} className='row-span-2 object-cover w-full h-full' />
+          <PostsGridChild url={url1} big={true}/>
           :
-          <Image src={url1} alt='post' width={500} height={500} className='object-cover w-full h-full' />
+          <PostsGridChild url={url1}/>
       }
-      <Image src={url2} alt='post' width={500} height={500} className='object-cover w-full h-full' />
+      <PostsGridChild url={url2} />
       {
         isLeftLayout ?
-          <Image src={url3} alt='post' width={500} height={500} className='object-cover w-full h-full' />
+          <PostsGridChild url={url3} />
           :
-          <Image src={url3} alt='post' width={500} height={1000} className='row-span-2 object-cover w-full h-full' />
+          <PostsGridChild url={url3} big={true}/>
       }
-      <Image src={url4} alt='post' width={500} height={500} className='object-cover w-full h-full' />
-      <Image src={url5} alt='post' width={500} height={500} className='object-cover w-full h-full' />
+      <PostsGridChild url={url4}/>
+      <PostsGridChild url={url5}/>
     </div>
   )
 }
