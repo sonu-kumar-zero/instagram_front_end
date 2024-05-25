@@ -21,7 +21,7 @@ const iconMap = {
     search: <IoSearch />,
     explore: <FaRegCompass />,
     reels: <SiYoutubeshorts />,
-    messages: <RiMessengerLine />,
+    direct: <RiMessengerLine />,
     notifications: <FaRegHeart />,
     create: <BiAddToQueue />,
     profile: <Image src={"/images/sonu_profile.jpeg"} width={25} height={25} alt='profile' className='rounded-full object-cover w-[25px] h-[25px]' />,
@@ -55,7 +55,7 @@ const mainOptions:
         },
         {
             "id": 5,
-            "icon": "messages",
+            "icon": "direct",
             "title": "Messages"
         },
         {
@@ -77,7 +77,7 @@ const mainOptions:
 
 const Navbar = () => {
     return (
-        <div className='p-5 px-3 w-[250px] flex flex-col bg-[#101010] border-r border-[#ddd] border-opacity-20 justify-between h-full'>
+        <div className='p-5 px-3 min-w-[250px] w-[250px] flex flex-col bg-[#101010] border-r border-[#ddd] border-opacity-20 justify-between h-full'>
             <div className="flex flex-col">
                 <Link href={"/"} className="text-2xl px-2 py-5 cursor-pointer">
                     Instagram

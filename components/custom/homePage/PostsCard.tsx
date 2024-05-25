@@ -24,7 +24,6 @@ const PostsCard: React.FC<PostCardProps> = ({ url, videoPlaying, setVideoPlaying
 
     const handleVidoSwitchOnAndOff = () => {
         if (videoBoxRef.current && !videoBoxRef.current.classList.contains("sound-icon")) {
-            console.log("clicked on post");
             isVideoPause ? videoRef?.current?.play() : videoRef?.current?.pause();
             setIsVideoPause((prev) => !prev);
         }
