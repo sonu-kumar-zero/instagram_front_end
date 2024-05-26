@@ -7,16 +7,17 @@ import PostDisplayer from '../common/PostDisplayer';
 
 interface PostsGridChildProps {
     url: string,
-    big?: boolean
+    big?: boolean,
+    height?: string 
 };
 
-const PostsGridChild: React.FC<PostsGridChildProps> = ({ url, big }) => {
+const PostsGridChild: React.FC<PostsGridChildProps> = ({ url, big, height ="h-full" }) => {
     const [overLayShow, SetOverLayShow] = useState<boolean>(false);
     const [postDisplayerOn, setPostDisplayerOn] = useState<boolean>(false);
     return (
         <>
             <div className={
-                `w-full h-full ${big ? 'row-span-2' : ''} relative cursor-pointer`
+                `w-full ${height} ${big ? 'row-span-2' : ''} relative cursor-pointer`
             }
                 onMouseEnter={() => { SetOverLayShow(true) }}
                 onMouseLeave={() => { SetOverLayShow(false) }}

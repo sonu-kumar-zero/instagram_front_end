@@ -86,7 +86,7 @@ const Navbar = () => {
                     {
                         mainOptions.map((opt, index) => {
                             return (
-                                <Link href={`${opt.icon !== "search" ? opt.icon !== "home" ? opt.icon : "/" : "#"}`} key={index} className='flex gap-3 py-3 px-2 items-center rounded-lg cursor-pointer hover:bg-[#232323]'>
+                                <Link href={`${opt.icon !== "search" ? opt.icon !== "home" ? "/" + opt.icon : "/" : "#"}`} key={index} className='flex gap-3 py-3 px-2 items-center rounded-lg cursor-pointer hover:bg-[#232323]'>
                                     <div className="text-[28px] w-[30px]">
                                         {iconMap[opt.icon]}
                                     </div>

@@ -1,9 +1,9 @@
 import React from 'react'
-import ReelsPage from '../../pages/ReelsPage'
+import ReelsPage from '@/pages/ReelsPage';
 
 interface ReelsPageProps {
-  params: {
-    reelId: string[]
+  params?: {
+    reelId?: string[]
   }
 }
 
