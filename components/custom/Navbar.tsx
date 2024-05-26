@@ -16,7 +16,7 @@ import {
 import Link from 'next/link';
 
 
-const iconMap = {
+const iconMap: Record<string, React.ReactNode> = {
     home: <GoHome />,
     search: <IoSearch />,
     explore: <FaRegCompass />,
@@ -24,7 +24,7 @@ const iconMap = {
     direct: <RiMessengerLine />,
     notifications: <FaRegHeart />,
     create: <BiAddToQueue />,
-    profile: <Image src={"/images/sonu_profile.jpeg"} width={25} height={25} alt='profile' className='rounded-full object-cover w-[25px] h-[25px]' />,
+    profile: (<Image src={"/images/sonu_profile.jpeg"} width={25} height={25} alt='profile' className='rounded-full object-cover w-[25px] h-[25px]' />),
 }
 
 const mainOptions:
