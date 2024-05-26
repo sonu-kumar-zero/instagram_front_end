@@ -38,7 +38,8 @@ const PostDisplayer: React.FC<PostDisplayerProps> = ({ url, setPostDisplayerOn }
     return (
         <>
             <div className="absolute top-0 left-0 z-50 w-[100dvw] h-[100dvh] bg-[#12121288] px-40 py-5 rounded-xl main_box_post_displayer" onClick={(e) => {
-                if (e.target.classList.contains("main_box_post_displayer")) {
+                const target = e.target as HTMLDivElement;
+                if (target.classList.contains("main_box_post_displayer")) {
                     setPostDisplayerOn(false);
                 };
             }}>
