@@ -79,3 +79,16 @@
 .remove_scroll_bar::-webkit-scrollbar{
   display: none;
 }
+
+.simple_navbar{
+  animation: opening 500ms ease-in-out;
+}
+
+@keyframes opening{
+  from {
+    width:0dvw;
+  }
+  to{
+    width:30dvw
+  }
+}
