@@ -243,7 +243,7 @@ const SimpleNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, serachBoxEn
                             <SearchUserBar />
                             <SearchUserBar />
                             <SearchUserBar />
-                            <SearchUserBar userName="KS"/>
+                            <SearchUserBar />
                         </div>
                     </div>
                 </div>
@@ -254,7 +254,7 @@ const SimpleNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, serachBoxEn
 
 const Navbar = () => {
 
-    const [serachBoxEnabled, setSearchBoxEnabled] = useState<boolean>(true);
+    const [serachBoxEnabled, setSearchBoxEnabled] = useState<boolean>(false);
 
     return (
         <>
