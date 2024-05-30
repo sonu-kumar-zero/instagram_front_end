@@ -1,9 +1,16 @@
-import React, { useState } from 'react'
+"use client";
+import React, { useState } from 'react';
+import { useDispatch } from "react-redux";
+import { addUser } from "@/features/user/userSlice";
+import {useRouter} from "next/navigation";
 
 interface LoginBoxProps {
 }
 
 const LoginBox: React.FC<LoginBoxProps> = () => {
+
+    const dispatch = useDispatch();
+    const router = useRouter();
 
     const [formData, setFormData] = useState<{
         email: string,
@@ -22,6 +29,8 @@ const LoginBox: React.FC<LoginBoxProps> = () => {
     const loginHandler = async () => {
         try {
             console.log(formData);
+            dispatch(addUser({userName: "stark", _id:"ajsiuashifhiuas"}));
+            router.push("/");
         } catch (error: any) {
             console.log(error?.message);
         }

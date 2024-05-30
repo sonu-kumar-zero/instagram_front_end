@@ -1,6 +1,7 @@
 import { Poppins } from "next/font/google";
-import { ThemeProvider } from "@/components/theme-provider"
 import "../globals.css";
+import { ThemeProvider } from "@/components/theme-provider";
+
 
 const poppins = Poppins({ subsets: ["latin"], weight: "400" });
 
@@ -11,15 +12,16 @@ export default function AuthLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${poppins.className} flex w-[100dvw] h-[100dvh] overflow-hidden`}>
-        <ThemeProvider
+      <body className={`${poppins.className} flex w-[100dvw] h-[100dvh] overflow-hidden `}>
+      <ThemeProvider
           attribute="class"
           defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >
-          {children}
-        </ThemeProvider></body>
+            {children}
+        </ThemeProvider>
+        </body>
     </html>
   );
 }
