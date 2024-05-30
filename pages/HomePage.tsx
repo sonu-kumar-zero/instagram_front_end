@@ -1,9 +1,11 @@
+
 import FriendBar from '@/components/custom/homePage/FriendBar'
 import PostsRecyclerView from '@/components/custom/homePage/PostsRecyclerView'
 import StorieBar from '@/components/custom/homePage/StorieBar'
 import React from 'react'
 
 const HomePage = () => {
+
   return (
     <div className='px-32 w-full flex overflow-y-scroll'>
       <div className="w-2/3 ">
