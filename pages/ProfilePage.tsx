@@ -14,8 +14,8 @@ interface ProfilePageProps {
     userName: string
 }
 
-const ProfilePage: React.FC<ProfilePageProps> = ({ }) => {
-    const user = useSelector((state: RootState) => state.user);
+const ProfilePage: React.FC<ProfilePageProps> = ({}) => {
+    const user = useSelector((state: RootState) => state.user.user);
     return (
         <div className="px-40">
             <div className="px-10 py-10  ">

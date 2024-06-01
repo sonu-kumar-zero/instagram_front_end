@@ -85,7 +85,7 @@ interface NavbBarProps {
 }
 
 const NormalNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled }) => {
-    const user = useSelector((state: RootState) => state.user);
+    const user = useSelector((state: RootState) => state.user.user);
     return (
         <div className='p-5 px-3 min-w-[250px] w-[250px] flex flex-col bg-[#101010] border-r border-[#ddd] border-opacity-20 justify-between h-full'>
             <div className="flex flex-col">
@@ -169,7 +169,7 @@ const SearchUserBar: React.FC<SearchUserBarProps> = ({ userName = "Starksonu12" 
 }
 
 const SimpleNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, serachBoxEnabled }) => {
-    const user = useSelector((state: RootState) => state.user);
+    const user = useSelector((state: RootState) => state.user.user);
     return (
         <>
             <div className="min-w-[250px] w-[250px] relative">
