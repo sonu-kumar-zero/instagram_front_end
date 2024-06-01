@@ -29,7 +29,7 @@ const SignUpBox: React.FC<SignUpBoxProps> = ({setLoginBox}) => {
         try {
             console.log(formData);
             if (formData.password === formData.confirmPassword && formData.password !== "" && formData.email !== "" && formData.userName !== "") {
-                const signUpRespose = await axios.post(`${process.env.NEXT_PUBLIC_USER_API_BACKEND}/user/register`, {
+                const signUpRespose = await axios.post(`http://127.0.0.1:4000/api/user/register`, {
                     ...formData
                 }, {
                     headers: {

@@ -42,7 +42,7 @@ const LoginBox: React.FC<LoginBoxProps> = () => {
     const loginHandler = async () => {
         try {
             console.log(formData);
-            const loginRespose = await axios.post(`${process.env.NEXT_PUBLIC_USER_API_BACKEND}/user/login`, {
+            const loginRespose = await axios.post(`http://127.0.0.1:4000/api/user/login`, {
                 ...formData
             }, {
                 headers: {
