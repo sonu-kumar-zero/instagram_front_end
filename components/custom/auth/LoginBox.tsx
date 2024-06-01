@@ -2,7 +2,20 @@
 import React, { useState } from 'react';
 import { useDispatch } from "react-redux";
 import { addUser } from "@/features/user/userSlice";
-import {useRouter} from "next/navigation";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+
+interface UserProps {
+    id: string;
+    userName: string;
+    bio: string | null;
+    email: string;
+    followerCount: number;
+    followingCount: number;
+    imageUrl: string | null;
+    name: string | null;
+    postsCount: number;
+}
 
 interface LoginBoxProps {
 }
@@ -29,8 +42,36 @@ const LoginBox: React.FC<LoginBoxProps> = () => {
     const loginHandler = async () => {
         try {
             console.log(formData);
-            dispatch(addUser({userName: "stark", _id:"ajsiuashifhiuas"}));
-            router.push("/");
+            // dispatch(addUser({userName: "stark", _id:"ajsiuashifhiuas"}));
+            // console.log(process.env.NEXT_PUBLIC_USER_API_BACKEND);
+            const loginRespose = await axios.post(`${process.env.NEXT_PUBLIC_USER_API_BACKEND}/user/login`, {
+                ...formData
+            }, {
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+            console.log(loginRespose);
+            if (loginRespose.status === 200) {
+                const user: UserProps = loginRespose.data.user;
+                const token = loginRespose.data.token;
+                dispatch(addUser(
+                    {
+                        userName: user.userName,
+                        id: user.id,
+                        bio: user.bio,
+                        email: user.email,
+                        followerCount: user.followerCount,
+                        followingCount: user.followingCount,
+                        imageUrl: user.imageUrl,
+                        name: user.name,
+                        postsCount: user.postsCount,
+                        token: token
+                    }
+                ));
+                router.push("/");
+            }
+            // router.push("/");
         } catch (error: any) {
             console.log(error?.message);
         }

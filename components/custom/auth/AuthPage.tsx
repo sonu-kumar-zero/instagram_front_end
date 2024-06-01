@@ -14,7 +14,7 @@ const AuthPage = () => {
                 {
                     isloginBox ?
                         <LoginBox /> :
-                        <SignUpBox />
+                        <SignUpBox setLoginBox={setLoginBox} />
                 }
             </div>
             <div className={`${isloginBox ? "py-10" : "py-5"} `}>

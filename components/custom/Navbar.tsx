@@ -15,6 +15,8 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import Link from 'next/link';
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -83,7 +85,7 @@ interface NavbBarProps {
 }
 
 const NormalNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled }) => {
-
+    const user = useSelector((state: RootState) => state.user);
     return (
         <div className='p-5 px-3 min-w-[250px] w-[250px] flex flex-col bg-[#101010] border-r border-[#ddd] border-opacity-20 justify-between h-full'>
             <div className="flex flex-col">
@@ -96,7 +98,7 @@ const NormalNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled }) => {
                     {
                         mainOptions.map((opt, index) => {
                             return (
-                                <Link href={`${opt.icon !== "search" ? opt.icon !== "home" ? "/" + opt.icon : "/" : "#"}`} key={index} className='flex gap-3 py-3 px-2 items-center rounded-lg cursor-pointer hover:bg-[#232323] border border-[#dedede00]' onClick={
+                                <Link href={`${opt.icon !== "search" ? opt.icon !== "home" ? opt.icon === "profile" ? user.userName : "/" + opt.icon : "/" : "#"}`} key={index} className='flex gap-3 py-3 px-2 items-center rounded-lg cursor-pointer hover:bg-[#232323] border border-[#dedede00]' onClick={
                                     (e) => {
                                         if (opt.icon === "search") {
                                             setSearchBoxEnabled(true);
@@ -104,10 +106,15 @@ const NormalNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled }) => {
                                     }
                                 } >
                                     <div className="text-[28px] px-[2px] w-[34px]" >
-                                        {iconMap[opt.icon]}
+                                        {
+                                            (opt.icon === "profile" && user.imageUrl !== null)
+                                                ?
+                                                <Image src={user.imageUrl} width={30} height={30} alt='profile' className='rounded-full object-cover w-[30px] h-[30px]' />
+                                                : iconMap[opt.icon]
+                                        }
                                     </div>
                                     <div className="">
-                                        {opt.title}
+                                        {opt.title === "Profile" ? user.userName : opt.title}
                                     </div>
                                 </Link>)
                         })
@@ -136,11 +143,11 @@ const NormalNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled }) => {
     )
 }
 
-interface SearchUserBarProps{
-    userName?:string
+interface SearchUserBarProps {
+    userName?: string
 }
 
-const SearchUserBar:React.FC<SearchUserBarProps> = ({userName="Starksonu12"}) => {
+const SearchUserBar: React.FC<SearchUserBarProps> = ({ userName = "Starksonu12" }) => {
     return (
         <>
             <div className="px-5 hover:bg-[#232323] flex items-center justify-between py-2 cursor-pointer">
@@ -154,7 +161,7 @@ const SearchUserBar:React.FC<SearchUserBarProps> = ({userName="Starksonu12"}) =>
                     </div>
                 </div>
                 <button className="text-2xl">
-                    <RxCross2/>
+                    <RxCross2 />
                 </button>
             </div>
         </>
@@ -162,6 +169,7 @@ const SearchUserBar:React.FC<SearchUserBarProps> = ({userName="Starksonu12"}) =>
 }
 
 const SimpleNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, serachBoxEnabled }) => {
+    const user = useSelector((state: RootState) => state.user);
     return (
         <>
             <div className="min-w-[250px] w-[250px] relative">
@@ -176,7 +184,7 @@ const SimpleNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, serachBoxEn
                             {
                                 mainOptions.map((opt, index) => {
                                     return (
-                                        <Link href={`${opt.icon !== "search" ? opt.icon !== "home" ? "/" + opt.icon : "/" : "#"}`} key={index} className='flex py-3 px-2 items-center rounded-lg cursor-pointer hover:bg-[#232323] border border-[#dedede00] hover:border-[#dedede88] justify-center' onClick={
+                                        <Link href={`${opt.icon !== "search" ? opt.icon !== "home" ? opt.icon === "profile" ? user.userName : "/" + opt.icon : "/" : "#"}`} key={index} className='flex py-3 px-2 items-center rounded-lg cursor-pointer hover:bg-[#232323] border border-[#dedede00] hover:border-[#dedede88] justify-center' onClick={
                                             (e) => {
                                                 if (opt.icon === "search") {
                                                     setSearchBoxEnabled(false);
@@ -184,7 +192,11 @@ const SimpleNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, serachBoxEn
                                             }
                                         }>
                                             <div className="text-[28px] " >
-                                                {iconMap[opt.icon]}
+                                                {
+                                                    (opt.icon === "profile" && user.imageUrl !== null)
+                                                        ?
+                                                        <Image src={user.imageUrl} width={30} height={30} alt='profile' className='rounded-full object-cover w-[30px] h-[30px]' />
+                                                        : iconMap[opt.icon]}
                                             </div>
                                         </Link>)
                                 })

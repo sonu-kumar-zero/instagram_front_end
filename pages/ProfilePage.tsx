@@ -7,12 +7,15 @@ import { IoAddOutline } from "react-icons/io5";
 import { MdGridOn } from "react-icons/md";
 import { FaRegBookmark } from "react-icons/fa";
 import { BsPersonSquare } from "react-icons/bs";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 
 interface ProfilePageProps {
     userName: string
 }
 
-const ProfilePage: React.FC<ProfilePageProps> = ({ userName }) => {
+const ProfilePage: React.FC<ProfilePageProps> = ({ }) => {
+    const user = useSelector((state: RootState) => state.user);
     return (
         <div className="px-40">
             <div className="px-10 py-10  ">
@@ -22,7 +25,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userName }) => {
                     </div>
                     <div className="flex flex-col gap-5">
                         <div className="flex gap-5 items-center">
-                            <div className="">starksonu12</div>
+                            <div className="">{user.userName}</div>
                             <div className="flex gap-2 text-sm">
                                 <button className="bg-[#56565666] px-4 py-1 rounded-md">Edit profile</button>
                                 <button className="bg-[#56565666] px-4 py-1 rounded-md">View archive</button>
@@ -33,22 +36,22 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userName }) => {
                         </div>
                         <div className="text-sm flex gap-10">
                             <div className="flex gap-1">
-                                <span className='font-semibold'>1</span>
+                                <span className='font-semibold'>{user.postsCount}</span>
                                 <span>post</span>
                             </div>
-                            <div className="flex gap-1">
-                                <span className='font-semibold'>56</span>
+                            <Link href={`/${user.userName}/followers`} className="flex gap-1 cursor-pointer">
+                                <span className='font-semibold'>{user.followerCount}</span>
                                 <span>followers</span>
-                            </div>
-                            <div className="flex gap-1">
-                                <span className='font-semibold'>33</span>
+                            </Link>
+                            <Link href={`/${user.userName}/following`} className="flex gap-1 cursor-pointer">
+                                <span className='font-semibold'>{user.followingCount}</span>
                                 <span>following</span>
-                            </div>
+                            </Link>
                         </div>
                         <div className="">
-                            <div className="text-xs font-semibold">starksonu12</div>
-                            <div className="text-sm">Currently nothing, I am in learning phase.</div>
-                            <div className="text-xs">NSUT25</div>
+                            <div className="text-xs font-semibold">{user.name ? user.name : user.userName}</div>
+                            <div className="text-sm break-all">{user.bio}</div>
+                            {/* <div className="text-xs">NSUT25</div> */}
                         </div>
                     </div>
                 </div>
@@ -67,15 +70,15 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userName }) => {
             </div>
 
             <div className="flex justify-center gap-16 py-5">
-                <Link href={`/${userName}`} className='flex gap-3 items-center'>
+                <Link href={`/${user.userName}`} className='flex gap-3 items-center'>
                     <MdGridOn />
                     <span className='font-semibold'>POSTS</span>
                 </Link>
-                <Link href={`/${userName}/saved`} className='flex gap-3 items-center'>
+                <Link href={`/${user.userName}/saved`} className='flex gap-3 items-center'>
                     <FaRegBookmark />
                     <span className='font-semibold'>SAVED</span>
                 </Link>
-                <Link href={`/${userName}/tagged`} className='flex gap-3 items-center'>
+                <Link href={`/${user.userName}/tagged`} className='flex gap-3 items-center'>
                     <BsPersonSquare />
                     <span className='font-semibold'>TAGGED</span>
                 </Link>
