@@ -15,7 +15,7 @@ interface ProfilePageProps {
 }
 
 const ProfilePage: React.FC<ProfilePageProps> = ({ }) => {
-    const user = useSelector((state: RootState) => state.user.user);
+    const user = useSelector((state: RootState) => state?.user.user);
     return (
         <>
             {
