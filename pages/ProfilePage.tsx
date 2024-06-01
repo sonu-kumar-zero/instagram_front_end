@@ -16,7 +16,7 @@ interface ProfilePageProps {
 
 const ProfilePage: React.FC<ProfilePageProps> = () => {
     // const user = useSelector((state: RootState | null) => state?.user.user);
-    const user = useAppSelector((state: RootState | undefined) => state?.user.user);
+    const user = useAppSelector((state: RootState) => state?.user.user);
 
     if (!user) {
         return <div>Loading...</div>; // or handle the null/undefined user case appropriately
