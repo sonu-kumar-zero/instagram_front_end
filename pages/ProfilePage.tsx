@@ -7,8 +7,8 @@ import { IoAddOutline } from "react-icons/io5";
 import { MdGridOn } from "react-icons/md";
 import { FaRegBookmark } from "react-icons/fa";
 import { BsPersonSquare } from "react-icons/bs";
-import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
+import { useAppSelector } from '@/store/hooks';
 
 interface ProfilePageProps {
     userName: string
@@ -16,7 +16,7 @@ interface ProfilePageProps {
 
 const ProfilePage: React.FC<ProfilePageProps> = ({ }) => {
     // const user = useSelector((state: RootState | null) => state?.user.user);
-    const user = useSelector((state: RootState | undefined) => state?.user.user);
+    const user = useAppSelector((state: RootState | undefined) => state?.user.user);
 
     if (!user) {
         return <div>Loading...</div>; // or handle the null/undefined user case appropriately
