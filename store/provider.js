@@ -14,22 +14,22 @@
 
 // export default StoreProvider
 
-"use client";
-import { Provider } from "react-redux";
-import { createStore } from "@/store/store";
-import { useRef ,useMemo } from "react";
+// "use client";
+// import { Provider } from "react-redux";
+// import { createStore } from "@/store/store";
+// import { useRef ,useMemo } from "react";
 
-function StoreProvider({ children }) {
-  const storeRef = useRef(null);
+// function StoreProvider({ children }) {
+//   const storeRef = useRef(null);
 
-  const store = useMemo(() => {
-    if (!storeRef.current) {
-      storeRef.current = createStore();
-    }
-    return storeRef.current;
-  }, []);
+//   const store = useMemo(() => {
+//     if (!storeRef.current) {
+//       storeRef.current = createStore();
+//     }
+//     return storeRef.current;
+//   }, []);
 
-  return <Provider store={store}>{children}</Provider>;
-}
+//   return <Provider store={store}>{children}</Provider>;
+// }
 
-export default StoreProvider;
+// export default StoreProvider;

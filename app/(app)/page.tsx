@@ -1,14 +1,13 @@
 "use client";
+import { useUserState } from "@/context/userContext";
 import HomePage from "@/pages/HomePage";
-import { redirect } from 'next/navigation'
-import { RootState } from "@/store/store";
-import { useAppSelector } from "@/store/hooks";
+import { redirect } from 'next/navigation';
 
 
 export default function Home() {
-  const user = useAppSelector((state: RootState) => state.user.user);
-  const token = useAppSelector((state: RootState) => state.user.token);
-  if (user.id === "" || token === null ) {
+  const userState = useUserState();
+  const token = userState ? userState.token : null;
+  if (token === null ) {
     redirect("/auth");
   }
   return (

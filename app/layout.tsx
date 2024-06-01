@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
-// import { ThemeProvider } from "@/components/theme-provider"
-import StoreProvider from "@/store/provider";
+import { UserStateContext } from "@/context/userContext";
 
 const poppins = Poppins({ subsets: ["latin"], weight: "400" });
 
@@ -19,16 +18,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.className} flex w-[100dvw] h-[100dvh] overflow-hidden`}>
-        {/* <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        > */}
-          <StoreProvider>
-            {children}
-          </StoreProvider>
-        {/* </ThemeProvider> */}
+        <UserStateContext>
+          {children}
+        </UserStateContext>
       </body>
     </html>
   );

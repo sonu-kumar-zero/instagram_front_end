@@ -1,9 +1,8 @@
 "use client";
 import React, { useState } from 'react';
-import { addUser } from "@/features/user/userSlice";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { useAppDispatch } from '@/store/hooks';
+import { useUserState } from '@/context/userContext';
 
 
 interface UserProps {
@@ -23,8 +22,8 @@ interface LoginBoxProps {
 
 const LoginBox: React.FC<LoginBoxProps> = () => {
 
-    const dispatch = useAppDispatch();
     const router = useRouter();
+    const userStates = useUserState();
 
     const [formData, setFormData] = useState<{
         email: string,
@@ -43,8 +42,6 @@ const LoginBox: React.FC<LoginBoxProps> = () => {
     const loginHandler = async () => {
         try {
             console.log(formData);
-            // dispatch(addUser({userName: "stark", _id:"ajsiuashifhiuas"}));
-            // console.log(process.env.NEXT_PUBLIC_USER_API_BACKEND);
             const loginRespose = await axios.post(`${process.env.NEXT_PUBLIC_USER_API_BACKEND}/user/login`, {
                 ...formData
             }, {
@@ -56,7 +53,7 @@ const LoginBox: React.FC<LoginBoxProps> = () => {
             if (loginRespose.status === 200) {
                 const user: UserProps = loginRespose.data.user;
                 const token = loginRespose.data.token;
-                dispatch(addUser(
+                userStates.setUser(
                     {
                         userName: user.userName,
                         id: user.id,
@@ -67,12 +64,11 @@ const LoginBox: React.FC<LoginBoxProps> = () => {
                         imageUrl: user.imageUrl,
                         name: user.name,
                         postsCount: user.postsCount,
-                        token: token
                     }
-                ));
+                );
+                userStates.setToken(token);
                 router.push("/");
             }
-            // router.push("/");
         } catch (error: any) {
             console.log(error?.message);
         }
