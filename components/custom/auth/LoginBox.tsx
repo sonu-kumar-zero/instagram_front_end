@@ -1,9 +1,10 @@
 "use client";
 import React, { useState } from 'react';
-import { useDispatch } from "react-redux";
 import { addUser } from "@/features/user/userSlice";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { useAppDispatch } from '@/store/hooks';
+
 
 interface UserProps {
     id: string;
@@ -22,7 +23,7 @@ interface LoginBoxProps {
 
 const LoginBox: React.FC<LoginBoxProps> = () => {
 
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     const router = useRouter();
 
     const [formData, setFormData] = useState<{

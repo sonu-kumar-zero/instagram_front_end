@@ -1,5 +1,4 @@
 "use client";
-import ProfilePage from "@/pages/ProfilePage";
 import React from "react";
 
 

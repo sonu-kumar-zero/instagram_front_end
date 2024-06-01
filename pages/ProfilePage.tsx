@@ -11,10 +11,10 @@ import { RootState } from "@/store/store";
 import { useAppSelector } from '@/store/hooks';
 
 interface ProfilePageProps {
-    userName: string
+
 }
 
-const ProfilePage: React.FC<ProfilePageProps> = ({ }) => {
+const ProfilePage: React.FC<ProfilePageProps> = () => {
     // const user = useSelector((state: RootState | null) => state?.user.user);
     const user = useAppSelector((state: RootState | undefined) => state?.user.user);
 

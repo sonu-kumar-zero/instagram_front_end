@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 import ProfilePage from "@/pages/ProfilePage";
 
@@ -7,10 +8,10 @@ interface PageProps {
   }
 }
 
-const Page: React.FC<PageProps> = ({ params }) => {
+const Page: React.FC<PageProps> = ( ) => {
   return (
     <div>
-      <ProfilePage userName={params.userId} />
+      <ProfilePage  />
     </div>
   )
 }
