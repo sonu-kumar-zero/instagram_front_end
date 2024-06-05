@@ -27,13 +27,13 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
                     <div className="px-10 py-10  ">
                         <div className="px-10 flex gap-20 items-center">
                             <div className="">
-                                <Image src={"/images/sonu_profile.jpeg"} width={200} height={200} alt='profile_img' className='w-[200px] h-[200px] rounded-full object-cover' />
+                                <Image src={user?.imageUrl ? `http://127.0.0.1:8000/uploads/profile/${user?.imageUrl}/300_300.jpg` : "/images/sonu_profile.jpg"} width={200} height={200} alt='profile_img' className='w-[200px] h-[200px] rounded-full object-cover' />
                             </div>
                             <div className="flex flex-col gap-5">
                                 <div className="flex gap-5 items-center">
                                     <div className="">{user.userName}</div>
                                     <div className="flex gap-2 text-sm">
-                                        <Link href={"/accounts/edit"} className="bg-[#56565666] px-4 py-1 rounded-md">Edit profile</Link>
+                                        <Link href={"/accounts"} className="bg-[#56565666] px-4 py-1 rounded-md">Edit profile</Link>
                                         <button className="bg-[#56565666] px-4 py-1 rounded-md">View archive</button>
                                         <button className="">
                                             <FiSettings size={28} />

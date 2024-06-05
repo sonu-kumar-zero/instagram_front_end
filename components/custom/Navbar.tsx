@@ -98,7 +98,7 @@ const NormalNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled }) => {
                     {
                         mainOptions.map((opt, index) => {
                             return (
-                                <Link href={`${opt.icon !== "search" ? opt.icon !== "home" ? opt.icon === "profile" ? "/"+ user?.userName : "/" + opt.icon : "/" : "#"}`} key={index} className='flex gap-3 py-3 px-2 items-center rounded-lg cursor-pointer hover:bg-[#232323] border border-[#dedede00]' onClick={
+                                <Link href={`${opt.icon !== "search" ? opt.icon !== "home" ? opt.icon === "profile" ? "/" + user?.userName : "/" + opt.icon : "/" : "#"}`} key={index} className='flex gap-3 py-3 px-2 items-center rounded-lg cursor-pointer hover:bg-[#232323] border border-[#dedede00]' onClick={
                                     (e) => {
                                         if (opt.icon === "search") {
                                             setSearchBoxEnabled(true);
@@ -109,7 +109,7 @@ const NormalNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled }) => {
                                         {
                                             (opt.icon === "profile" && user?.imageUrl !== null)
                                                 ?
-                                                <Image src={user?.imageUrl} width={30} height={30} alt='profile' className='rounded-full object-cover w-[30px] h-[30px]' />
+                                                <Image src={`http://127.0.0.1:8000/uploads/profile/${user?.imageUrl}/100_100.jpg`} width={30} height={30} alt='profile' className='rounded-full object-cover w-[30px] h-[30px]' />
                                                 : iconMap[opt.icon]
                                         }
                                     </div>
@@ -196,7 +196,7 @@ const SimpleNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, serachBoxEn
                                                 {
                                                     (opt.icon === "profile" && user?.imageUrl !== null)
                                                         ?
-                                                        <Image src={user?.imageUrl} width={30} height={30} alt='profile' className='rounded-full object-cover w-[30px] h-[30px]' />
+                                                        <Image src={`http://127.0.0.1:8000/uploads/profile/${user?.imageUrl}/100_100.jpg`} width={30} height={30} alt='profile' className='rounded-full object-cover w-[30px] h-[30px]' />
                                                         : iconMap[opt.icon]}
                                             </div>
                                         </Link>)
