@@ -33,7 +33,7 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
                                 <div className="flex gap-5 items-center">
                                     <div className="">{user.userName}</div>
                                     <div className="flex gap-2 text-sm">
-                                        <button className="bg-[#56565666] px-4 py-1 rounded-md">Edit profile</button>
+                                        <Link href={"/accounts/edit"} className="bg-[#56565666] px-4 py-1 rounded-md">Edit profile</Link>
                                         <button className="bg-[#56565666] px-4 py-1 rounded-md">View archive</button>
                                         <button className="">
                                             <FiSettings size={28} />

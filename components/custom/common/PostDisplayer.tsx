@@ -55,7 +55,7 @@ const PostDisplayer: React.FC<PostDisplayerProps> = ({ url, setPostDisplayerOn }
                                 <div className="text-[14px] font-medium flex gap-1">
                                     <div className="cursor-pointer text-[#dedede] hover:text-[#dedede77]">7billionairesline</div>
                                     <div className="cursor-default">•</div>
-                                    <button className="text-[#00bfffbb] font-semibold hover:text-[#dedede]">Follow</button>
+                                    <button className="text-[#0095f6] font-semibold hover:text-[#dedede]">Follow</button>
                                 </div>
                             </div>
                             <button className='text-xl py-2 px-2 hover:text-[#898989] hover:font-bold text-[#dedede]'>
@@ -109,7 +109,7 @@ const PostDisplayer: React.FC<PostDisplayerProps> = ({ url, setPostDisplayerOn }
                         <div className="p-3 border-t w-full flex gap-3">
                             <GrEmoji size={32} />
                             <input placeholder='Add a comment...' className='w-full outline-none bg-[#090909] text-[#dedededd]' />
-                            <button className='text-[#00bfffbb] font-semibold hover:text-[#dedede]'>Post</button>
+                            <button className='text-[#0095f6] font-semibold hover:text-[#dedede]'>Post</button>
                         </div>
                     </div>
                 </div>

@@ -21,7 +21,7 @@ const AuthPage = () => {
                 <div className={`h-1 ${isloginBox ? "my-10" : "my-1"} w-full bg-[#23232377]`}></div>
                 <div className="py-2 flex flex-col gap-3">
                     <div className="text-center">{isloginBox ? `Don't Have an Account` : "Have an Account! Log IN"}</div>
-                    <button className='w-full text-[#dedede] bg-[#00bfffbb] rounded py-2' onClick={
+                    <button className='w-full text-[#dedede] bg-[#0095f6] rounded py-2' onClick={
                         (e) => {
                             setLoginBox(prev => !prev)
                         }

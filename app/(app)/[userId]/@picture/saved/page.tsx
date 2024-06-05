@@ -27,7 +27,7 @@ const Page = () => {
     <div>
       <div className="flex justify-between items-center">
         <div className="text-xs text-[#dedede77]">Only you can see what you&apos;ve saved</div>
-        <button className="text-[#00bfffbb]">+ New Collection</button>
+        <button className="text-[#0095f6]">+ New Collection</button>
       </div>
       <div className="grid grid-cols-3 gap-3 py-3">
           <SavedCard url={"/images/high/1.jpg"} collectionName='All Posts'/>

@@ -67,7 +67,7 @@ const SignUpBox: React.FC<SignUpBoxProps> = ({setLoginBox}) => {
                     <input placeholder='' type='password' id='confirmPassword' name='confirmPassword' className='text-sm outline-none w-full bg-transparent focus:bg-transparent' value={formData.confirmPassword} onChange={onInputValueChange} />
                 </div>
                 <div className="py-2">
-                    <button className='w-full text-[#dedede] bg-[#00bfffbb] rounded py-2' onClick={
+                    <button className='w-full text-[#dedede] bg-[#0095f6] rounded py-2' onClick={
                         (e) => {
                             e.preventDefault();
                             handleSignUp();

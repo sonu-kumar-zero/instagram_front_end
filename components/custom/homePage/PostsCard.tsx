@@ -86,7 +86,7 @@ const PostsCard: React.FC<PostCardProps> = ({ url, videoPlaying, setVideoPlaying
                             <div className="">•</div>
                             <div className="text-[#dedede88]">3w</div>
                             <div className="">•</div>
-                            <div className="text-[#00bfffbb]">Follow</div>
+                            <div className="text-[#0095f6]">Follow</div>
                         </div>
                         <div className="text-xs text-[#dedede] text-opacity-60 cursor-default">original audio</div>
                     </div>
@@ -149,7 +149,7 @@ const PostsCard: React.FC<PostCardProps> = ({ url, videoPlaying, setVideoPlaying
                 <div className="font-medium text-sm flex items-end">
                     <textarea value={commentVal} onChange={(e) => setCommentVal(e.target.value)} placeholder="Add a comment..." className="w-full outline-none resize-none" rows={1} ref={commentInputRef} />
                     {
-                        commentVal === "" ? "" : <button className="text-[#00bfffbb] hover:text-[#dedede] hover:text-semibold">Post</button>
+                        commentVal === "" ? "" : <button className="text-[#0095f6] hover:text-[#dedede] hover:text-semibold">Post</button>
                     }
                 </div>
 

@@ -98,7 +98,7 @@ const NormalNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled }) => {
                     {
                         mainOptions.map((opt, index) => {
                             return (
-                                <Link href={`${opt.icon !== "search" ? opt.icon !== "home" ? opt.icon === "profile" ? user?.userName : "/" + opt.icon : "/" : "#"}`} key={index} className='flex gap-3 py-3 px-2 items-center rounded-lg cursor-pointer hover:bg-[#232323] border border-[#dedede00]' onClick={
+                                <Link href={`${opt.icon !== "search" ? opt.icon !== "home" ? opt.icon === "profile" ? "/"+ user?.userName : "/" + opt.icon : "/" : "#"}`} key={index} className='flex gap-3 py-3 px-2 items-center rounded-lg cursor-pointer hover:bg-[#232323] border border-[#dedede00]' onClick={
                                     (e) => {
                                         if (opt.icon === "search") {
                                             setSearchBoxEnabled(true);
@@ -185,7 +185,7 @@ const SimpleNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, serachBoxEn
                             {
                                 mainOptions.map((opt, index) => {
                                     return (
-                                        <Link href={`${opt.icon !== "search" ? opt.icon !== "home" ? opt.icon === "profile" ? user?.userName : "/" + opt.icon : "/" : "#"}`} key={index} className='flex py-3 px-2 items-center rounded-lg cursor-pointer hover:bg-[#232323] border border-[#dedede00] hover:border-[#dedede88] justify-center' onClick={
+                                        <Link href={`${opt.icon !== "search" ? opt.icon !== "home" ? opt.icon === "profile" ? "/" + user?.userName : "/" + opt.icon : "/" : "#"}`} key={index} className='flex py-3 px-2 items-center rounded-lg cursor-pointer hover:bg-[#232323] border border-[#dedede00] hover:border-[#dedede88] justify-center' onClick={
                                             (e) => {
                                                 if (opt.icon === "search") {
                                                     setSearchBoxEnabled(false);
@@ -226,14 +226,14 @@ const SimpleNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, serachBoxEn
                         <div className="text-xl font-semibold">Search</div>
                         <div className="flex w-full rounded-lg  bg-[#232323] p-3">
                             <input placeholder='Seach...' className='outline-none border-none w-full bg-[#232323]' />
-                            <button className='text-[#00bfffbb]'>Search</button>
+                            <button className='text-[#0095f6]'>Search</button>
                         </div>
                     </div>
                     <div className="pb-4 h-[80dvh] flex w-full">
                         <div className="h-full w-full flex flex-col overflow-y-scroll">
                             <div className="flex justify-between px-5 py-5">
                                 <div className="font-semibold">Recent</div>
-                                <div className="text-[#00bfffbb]">Clear all</div>
+                                <div className="text-[#0095f6]">Clear all</div>
                             </div>
                             <SearchUserBar />
                             <SearchUserBar />

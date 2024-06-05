@@ -8,10 +8,10 @@ import PostDisplayer from '../common/PostDisplayer';
 interface PostsGridChildProps {
     url: string,
     big?: boolean,
-    height?: string 
+    height?: string
 };
 
-const PostsGridChild: React.FC<PostsGridChildProps> = ({ url, big, height ="h-full" }) => {
+const PostsGridChild: React.FC<PostsGridChildProps> = ({ url, big, height = "h-full" }) => {
     const [overLayShow, SetOverLayShow] = useState<boolean>(false);
     const [postDisplayerOn, setPostDisplayerOn] = useState<boolean>(false);
     return (
@@ -21,8 +21,8 @@ const PostsGridChild: React.FC<PostsGridChildProps> = ({ url, big, height ="h-fu
             }
                 onMouseEnter={() => { SetOverLayShow(true) }}
                 onMouseLeave={() => { SetOverLayShow(false) }}
-                onClick={()=>{setPostDisplayerOn(true)}}
-                >
+                onClick={() => { setPostDisplayerOn(true) }}
+            >
                 <Image src={url} alt='post' width={200} height={200} className={
                     `object-cover w-full h-full saturate-50`
                 } />
@@ -38,7 +38,7 @@ const PostsGridChild: React.FC<PostsGridChildProps> = ({ url, big, height ="h-fu
             </div>
             {
                 postDisplayerOn &&
-                <PostDisplayer url={url} setPostDisplayerOn={setPostDisplayerOn}/>
+                <PostDisplayer url={url} setPostDisplayerOn={setPostDisplayerOn} />
             }
         </>
     )

@@ -13,7 +13,7 @@ const FriendBar = () => {
                     <div className="text-xs text-[#dedede] text-opacity-60 cursor-default">starksonu12</div>
                 </div>
             </div>
-            <button className='text-xs py-2 px-2 hover:text-[#dedede] hover:font-bold text-[#00bfffbb]'>Switch</button>
+            <button className='text-xs py-2 px-2 hover:text-[#dedede] hover:font-bold text-[#0095f6]'>Switch</button>
         </div>
     )
 }
