@@ -18,6 +18,14 @@ const ReelsPage: React.FC<ReelsPageProps> = () => {
             <div className="w-full h-[16px]">&nbsp;</div>
             <ReelsCard url={"/videos/vid4.mp4"} audioPlaying={audioPlaying} setAudioPlaying={setAudioPlaying} />
             <div className="w-full h-[16px]">&nbsp;</div>
+            <ReelsCard url={"/videos/vid1.mp4"} audioPlaying={audioPlaying} setAudioPlaying={setAudioPlaying} />
+            <div className="w-full h-[16px]">&nbsp;</div>
+            <ReelsCard url={"/videos/vid2.mp4"} audioPlaying={audioPlaying} setAudioPlaying={setAudioPlaying} />
+            <div className="w-full h-[16px]">&nbsp;</div>
+            <ReelsCard url={"/videos/vid3.mp4"} audioPlaying={audioPlaying} setAudioPlaying={setAudioPlaying} />
+            <div className="w-full h-[16px]">&nbsp;</div>
+            <ReelsCard url={"/videos/vid4.mp4"} audioPlaying={audioPlaying} setAudioPlaying={setAudioPlaying} />
+            <div className="w-full h-[16px]">&nbsp;</div>
         </div>
     )
 }

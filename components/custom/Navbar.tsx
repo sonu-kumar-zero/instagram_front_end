@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import Link from 'next/link';
 import { useUserState } from '@/context/userContext';
+import SearchView from '@/components/custom/search/SearchView';
 
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -143,30 +144,6 @@ const NormalNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled }) => {
     )
 }
 
-interface SearchUserBarProps {
-    userName?: string
-}
-
-const SearchUserBar: React.FC<SearchUserBarProps> = ({ userName = "Starksonu12" }) => {
-    return (
-        <>
-            <div className="px-5 hover:bg-[#232323] flex items-center justify-between py-2 cursor-pointer">
-                <div className="flex items-center gap-3">
-                    <div className="">
-                        <Image src={"/images/sonu_profile.jpeg"} width={50} height={50} alt='user_profile_icon' className='w-[50px] h-[50px] object-cover rounded-full' />
-                    </div>
-                    <div className="">
-                        <div className="">{userName}</div>
-                        <div className="text-[#dedede77] text-sm">sonu kumar</div>
-                    </div>
-                </div>
-                <button className="text-2xl">
-                    <RxCross2 />
-                </button>
-            </div>
-        </>
-    )
-}
 
 const SimpleNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, serachBoxEnabled }) => {
     const userState = useUserState();
@@ -220,46 +197,7 @@ const SimpleNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, serachBoxEn
                         </div>
                     </div>
                 </div>
-                <div
-                    className={`absolute top-0 left-[76px] w-[30dvw] h-[100dvh] bg-[#101010] z-10 simple_navbar rounded-r-xl flex flex-col`}>
-                    <div className="border-b border-[#dedede77] px-4 py-6 flex flex-col gap-8">
-                        <div className="text-xl font-semibold">Search</div>
-                        <div className="flex w-full rounded-lg  bg-[#232323] p-3">
-                            <input placeholder='Seach...' className='outline-none border-none w-full bg-[#232323]' />
-                            <button className='text-[#0095f6]'>Search</button>
-                        </div>
-                    </div>
-                    <div className="pb-4 h-[80dvh] flex w-full">
-                        <div className="h-full w-full flex flex-col overflow-y-scroll">
-                            <div className="flex justify-between px-5 py-5">
-                                <div className="font-semibold">Recent</div>
-                                <div className="text-[#0095f6]">Clear all</div>
-                            </div>
-                            <SearchUserBar />
-                            <SearchUserBar />
-                            <SearchUserBar />
-                            <SearchUserBar />
-                            <SearchUserBar />
-                            <SearchUserBar />
-                            <SearchUserBar />
-                            <SearchUserBar />
-                            <SearchUserBar />
-                            <SearchUserBar />
-                            <SearchUserBar />
-                            <SearchUserBar />
-                            <SearchUserBar />
-                            <SearchUserBar />
-                            <SearchUserBar />
-                            <SearchUserBar />
-                            <SearchUserBar />
-                            <SearchUserBar />
-                            <SearchUserBar />
-                            <SearchUserBar />
-                            <SearchUserBar />
-                            <SearchUserBar />
-                        </div>
-                    </div>
-                </div>
+                <SearchView />
             </div>
         </>
     )
