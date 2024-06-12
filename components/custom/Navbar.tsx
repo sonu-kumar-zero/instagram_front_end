@@ -17,6 +17,7 @@ import {
 import Link from 'next/link';
 import { useUserState } from '@/context/userContext';
 import SearchView from '@/components/custom/search/SearchView';
+import ImageUploader from '@/components/custom/mediaupload/ImageUploader';
 
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -26,8 +27,8 @@ const iconMap: Record<string, React.ReactNode> = {
     reels: <SiYoutubeshorts />,
     direct: <RiMessengerLine />,
     notifications: <FaRegHeart />,
-    create: <BiAddToQueue />,
-    profile: (<Image src={"/images/sonu_profile.jpeg"} width={30} height={30} alt='profile' className='rounded-full object-cover w-[30px] h-[30px]' />),
+    // create: <BiAddToQueue />,
+    // profile: (<Image src={"/images/sonu_profile.jpeg"} width={30} height={30} alt='profile' className='rounded-full object-cover w-[30px] h-[30px]' />),
 }
 
 const mainOptions:
@@ -66,25 +67,27 @@ const mainOptions:
             "icon": "notifications",
             "title": "Notifications"
         },
-        {
-            "id": 7,
-            "icon": "create",
-            "title": "Create"
-        },
-        {
-            "id": 8,
-            "icon": "profile",
-            "title": "Profile"
-        },
+        // {
+        //     "id": 7,
+        //     "icon": "create",
+        //     "title": "Create"
+        // },
+        // {
+        //     "id": 8,
+        //     "icon": "profile",
+        //     "title": "Profile"
+        // },
     ]
 
 
 interface NavbBarProps {
-    setSearchBoxEnabled: React.Dispatch<React.SetStateAction<boolean>>,
-    serachBoxEnabled: boolean
+    setSearchBoxEnabled: React.Dispatch<React.SetStateAction<boolean>>;
+    serachBoxEnabled: boolean;
+    setUploadBoxEnabled: React.Dispatch<React.SetStateAction<boolean>>;
+    uploadBoxEnabled: boolean;
 }
 
-const NormalNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled }) => {
+const NormalNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled,setUploadBoxEnabled }) => {
     const userState = useUserState();
     const user = userState ? userState.user : null;
     return (
@@ -99,7 +102,7 @@ const NormalNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled }) => {
                     {
                         mainOptions.map((opt, index) => {
                             return (
-                                <Link href={`${opt.icon !== "search" ? opt.icon !== "home" ? opt.icon === "profile" ? "/" + user?.userName : "/" + opt.icon : "/" : "#"}`} key={index} className='flex gap-3 py-3 px-2 items-center rounded-lg cursor-pointer hover:bg-[#232323] border border-[#dedede00]' onClick={
+                                <Link href={`${opt.icon !== "search" ? opt.icon !== "home" ? "/" + opt.icon : "/" : "#"}`} key={index} className='flex gap-3 py-3 px-2 items-center rounded-lg cursor-pointer hover:bg-[#232323] border border-[#dedede00]' onClick={
                                     (e) => {
                                         if (opt.icon === "search") {
                                             setSearchBoxEnabled(true);
@@ -108,18 +111,39 @@ const NormalNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled }) => {
                                 } >
                                     <div className="text-[28px] px-[2px] w-[34px]" >
                                         {
-                                            (opt.icon === "profile" && user?.imageUrl !== null)
-                                                ?
-                                                <Image src={`http://127.0.0.1:8000/uploads/profile/${user?.imageUrl}/100_100.jpg`} width={30} height={30} alt='profile' className='rounded-full object-cover w-[30px] h-[30px]' />
-                                                : iconMap[opt.icon]
+                                            iconMap[opt.icon]
                                         }
                                     </div>
                                     <div className="">
-                                        {opt.title === "Profile" ? user?.userName : opt.title}
+                                        {opt.title}
                                     </div>
-                                </Link>)
+                                </Link>
+                            )
                         })
                     }
+                    <button className="flex gap-3 py-3 px-2 items-center rounded-lg cursor-pointer hover:bg-[#232323] border border-[#dedede00]" onClick={
+                        ()=>{
+                            setUploadBoxEnabled(true)
+                        }
+                        }>
+                        <div className="text-[28px] px-[2px] w-[34px]">
+                            <BiAddToQueue />
+                        </div>
+                        <div className="">Create</div>
+                    </button>
+                    <Link href={`/${user?.userName}`} className='flex gap-3 py-3 px-2 items-center rounded-lg cursor-pointer hover:bg-[#232323] border border-[#dedede00]'  >
+                        <div className="text-[28px] px-[2px] w-[34px]" >
+                            {
+                                user?.imageUrl !== null
+                                    ?
+                                    <Image src={`http://127.0.0.1:8000/uploads/profile/${user?.imageUrl}/100_100.jpg`} width={30} height={30} alt='profile' className='rounded-full object-cover w-[30px] h-[30px]' />
+                                    : <Image src={`/images/sonu_profile.jpeg`} width={30} height={30} alt='profile' className='rounded-full object-cover w-[30px] h-[30px]' />
+                            }
+                        </div>
+                        <div className="">
+                            {user?.userName || ""}
+                        </div>
+                    </Link>
                 </div>
             </div>
             <div className="">
@@ -145,7 +169,7 @@ const NormalNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled }) => {
 }
 
 
-const SimpleNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, serachBoxEnabled }) => {
+const SimpleNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, serachBoxEnabled, setUploadBoxEnabled}) => {
     const userState = useUserState();
     const user = userState ? userState.user : null;
     return (
@@ -176,9 +200,23 @@ const SimpleNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, serachBoxEn
                                                         <Image src={`http://127.0.0.1:8000/uploads/profile/${user?.imageUrl}/100_100.jpg`} width={30} height={30} alt='profile' className='rounded-full object-cover w-[30px] h-[30px]' />
                                                         : iconMap[opt.icon]}
                                             </div>
-                                        </Link>)
+                                        </Link>
+                                    )
                                 })
                             }
+                            <div className="flex py-3 px-2 items-center rounded-lg cursor-pointer hover:bg-[#232323] border border-[#dedede00] hover:border-[#dedede88] justify-center text-[28px]">
+                                <BiAddToQueue />
+                            </div>
+                            <Link href={`/${user?.userName}`} className='flex py-3 px-2 items-center rounded-lg cursor-pointer hover:bg-[#232323] border border-[#dedede00] hover:border-[#dedede88] justify-center'>
+                                <div className="text-[28px]" >
+                                    {
+                                        user?.imageUrl !== null
+                                            ?
+                                            <Image src={`http://127.0.0.1:8000/uploads/profile/${user?.imageUrl}/100_100.jpg`} width={30} height={30} alt='profile' className='rounded-full object-cover w-[30px] h-[30px]' />
+                                            : <Image src={`images/sonu_profile.jpeg`} width={30} height={30} alt='profile' className='rounded-full object-cover w-[30px] h-[30px]' />
+                                    }
+                                </div>
+                            </Link>
                         </div>
                     </div>
                     <div className="">
@@ -206,10 +244,28 @@ const SimpleNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, serachBoxEn
 const Navbar = () => {
 
     const [serachBoxEnabled, setSearchBoxEnabled] = useState<boolean>(false);
+    const [uploadBoxEnabled, setUploadBoxEnabled] = useState<boolean>(false);
 
     return (
         <>
-            {serachBoxEnabled ? <SimpleNavbar setSearchBoxEnabled={setSearchBoxEnabled} serachBoxEnabled={serachBoxEnabled} /> : <NormalNavbar setSearchBoxEnabled={setSearchBoxEnabled} serachBoxEnabled={serachBoxEnabled} />}
+            {
+                serachBoxEnabled ?
+                    <SimpleNavbar 
+                        setSearchBoxEnabled={setSearchBoxEnabled} 
+                        serachBoxEnabled={serachBoxEnabled}
+                        uploadBoxEnabled={uploadBoxEnabled}
+                        setUploadBoxEnabled={setUploadBoxEnabled} />
+                    :
+                    <NormalNavbar 
+                        setSearchBoxEnabled={setSearchBoxEnabled} 
+                        serachBoxEnabled={serachBoxEnabled} 
+                        uploadBoxEnabled={uploadBoxEnabled}
+                        setUploadBoxEnabled={setUploadBoxEnabled}
+                    />
+            }
+            {
+                uploadBoxEnabled && <ImageUploader setUploadBoxEnabled={setUploadBoxEnabled}/>
+            }
         </>
     )
 }
