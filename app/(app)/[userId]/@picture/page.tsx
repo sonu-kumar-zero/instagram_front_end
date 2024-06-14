@@ -1,6 +1,6 @@
 
 import React from 'react'
-import PostsGridChild from '@/components/custom/explore/PostsGridChild'
+import PicturePage from '@/components/custom/posts_profile/PicturePage'
 
 interface PageProps {
   params: {
@@ -12,15 +12,7 @@ interface PageProps {
 const page: React.FC<PageProps> = ({ params }) => {
   return (
     <>
-      <div className="grid grid-cols-3 w-full gap-1">
-        <PostsGridChild url={"/images/high/1.jpg"} height={"h-[300px]"}/>
-        <PostsGridChild url={"/images/high/2.jpg"} height={"h-[300px]"}/>
-        <PostsGridChild url={"/images/high/3.jpg"} height={"h-[300px]"}/>
-        <PostsGridChild url={"/images/high/4.jpg"} height={"h-[300px]"}/>
-        <PostsGridChild url={"/images/high/5.jpg"} height={"h-[300px]"}/>
-        <PostsGridChild url={"/images/high/6.jpg"} height={"h-[300px]"}/>
-        <PostsGridChild url={"/images/high/7.jpg"} height={"h-[300px]"}/>
-      </div>         
+      <PicturePage userName={params.userId} />
     </>
   )
 }

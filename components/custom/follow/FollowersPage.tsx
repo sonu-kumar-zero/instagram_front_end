@@ -14,7 +14,7 @@ interface FollowerUserType {
     followerId: string,
     followingId: string,
     isAccepted: boolean,
-    user: {
+    follower: {
         imageUrl: string | null,
         name: string | null,
         userName: string
@@ -29,21 +29,16 @@ const FollowersPage = () => {
 
     // we will implement pagination in it later 
     const fetchAllFollowersOfUsers = useCallback(async () => {
-        const allFollowersOfUsersByUserIdResponse = await axios.post(
-            `http://127.0.0.1:5000/graphql`,
-            {
-                query: getAllFollowersOfUserByUserId,
-                variables: {
-                    getAllFollowersByUserIdId: user.id
-                }
-            }
+        if (!user.id)
+            return
+        const allFollowersOfUsersByUserIdResponse = await axios.get(
+            `http://localhost:4000/api/user/follow/follower/${user.id}`
         );
 
         if (allFollowersOfUsersByUserIdResponse.status === 200) {
-            setAllFollowers((prev) => (allFollowersOfUsersByUserIdResponse.data.data.getAllFollowersByUserId));
-        }
-
-    }, [user.id]);
+            setAllFollowers((prev) => (allFollowersOfUsersByUserIdResponse.data.users));
+        };
+    }, [user?.id]);
 
     useEffect(() => {
         fetchAllFollowersOfUsers();
@@ -70,10 +65,10 @@ const FollowersPage = () => {
                                     followRequestId={foll.id}
                                     followerId={foll.followerId}
                                     isAccepted={foll.isAccepted}
-                                    name={foll.user.name}
+                                    name={foll.follower.name}
                                     userId={foll.followingId}
-                                    userName={foll.user.userName}
-                                    imageUrl={foll.user.imageUrl} />
+                                    userName={foll.follower.userName}
+                                    imageUrl={foll.follower.imageUrl} />
                             })
                         }
                     </div>

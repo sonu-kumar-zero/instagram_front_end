@@ -292,13 +292,6 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadBoxEnabled }) =>
     }, [currentIdx, files, propertList]);
 
 
-    // {idx: 0, url: '6bd98040-7823-40a1-b5d8-ec1915d33370', type: 'IMAGE'}
-    // {idx: 1, url: 'd1a862ea-f17d-40a0-8a74-fb810fc63594', type: 'IMAGE'}
-    // {idx: 2, url: 'fb1ec474-9f8d-4f0d-8020-39100df337d1', type: 'IMAGE'}
-    // {idx: 3, url: 'b2dee16a-8dde-49c3-aa79-360083209335', type: 'IMAGE'}
-    // {idx: 4, url: 'ea5f98db-bbda-403e-bd49-0c8c0114922a', type: 'IMAGE'}
-    // {idx: 5, url: '39079070-1543-4e58-a70c-106419c61101', type: 'IMAGE'}
-
     return (
         <>
             <div

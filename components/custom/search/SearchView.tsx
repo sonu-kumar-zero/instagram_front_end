@@ -1,8 +1,8 @@
 "use client";
-import React, { use, useState } from 'react';
+import React, { useState } from 'react';
 import SearchUserBar from '@/components/custom/search/SearchUserBar';
 import axios from 'axios';
-import { searchUserByUser } from '@/constants/queries';
+// import { searchUserByUser } from '@/constants/queries';
 
 interface searchUserType {
     bio: string | null,
@@ -18,24 +18,26 @@ interface searchUserType {
 
 const SearchView = () => {
 
+    // axios.post(
+    //     "http://127.0.0.1:5000/graphql",
+    //     {
+    //         query: searchUserByUser,
+    //         variables: {
+    //             userName: searchVal
+    //         }
+    //     }
+    // );
+
     const [searchVal, setSearchVal] = useState<string>("");
-    const [users, setUsers] = useState([]);
+    const [users, setUsers] = useState<searchUserType[]>([]);
 
     const handleSearch = async () => {
         try {
-            console.log("hello");
-            const searchResponse = await axios.post(
-                "http://127.0.0.1:5000/graphql",
-                {
-                    query: searchUserByUser,
-                    variables: {
-                        userName: searchVal
-                    }
-                }
+            const searchResponse = await axios.get(
+                `http://localhost:4000/api/user/search/${searchVal}`
             );
-            console.log(searchResponse);
             if (searchResponse.status === 200) {
-                setUsers((prev) => searchResponse.data.data.getUserByuserName);
+                setUsers((prev) => searchResponse.data.users);
             }
         } catch (error: any) {
             console.log(error.message);
@@ -60,7 +62,7 @@ const SearchView = () => {
                             <button className="text-[#0095f6]">Clear all</button>
                         </div>
                         {
-                            users.length > 0 && users.map((us: searchUserType) => {
+                            users.length > 0 && users.map((us) => {
                                 return <SearchUserBar key={us.id} id={us.id} imageUrl={us.imageUrl} userName={us.userName} name={us.name} />
                             })
                         }

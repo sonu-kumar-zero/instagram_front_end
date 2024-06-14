@@ -22,7 +22,7 @@ interface FollowerUserType {
     id: string,
     followerId: string,
     followingId: string,
-    user: {
+    following: {
         imageUrl: string | null,
         name: string | null,
         userName: string
@@ -36,23 +36,17 @@ const FollowingPage = () => {
     const user = userStates ? userStates.user : null;
 
     const fetchAllFollowingsOfUsers = useCallback(async () => {
-        const allFollowersOfUsersByUserIdResponse = await axios.post(
-            `http://127.0.0.1:5000/graphql`,
-            {
-                query: getAllFollowingOfUserByUserId,
-                variables: {
-                    getAllFollowingByUsetIdId: user.id
-                }
-            }
+        if (!user.id)
+            return;
+        const allFollowersOfUsersByUserIdResponse = await axios.get(
+            `http://localhost:4000/api/user/follow/following/${user.id}`
         );
 
-        console.log(allFollowersOfUsersByUserIdResponse);
-
         if (allFollowersOfUsersByUserIdResponse.status === 200) {
-            setAllFollowings((prev) => (allFollowersOfUsersByUserIdResponse.data.data.getAllFollowingByUsetId));
+            setAllFollowings((prev) => (allFollowersOfUsersByUserIdResponse.data.users));
         }
 
-    }, [user.id]);
+    }, [user?.id]);
 
     useEffect(() => {
         fetchAllFollowingsOfUsers();
@@ -79,10 +73,10 @@ const FollowingPage = () => {
                                     followRequestId={foll.id}
                                     followerId={foll.followerId}
                                     isAccepted={true}
-                                    name={foll.user.name}
+                                    name={foll.following.name}
                                     userId={foll.followingId}
-                                    userName={foll.user.userName}
-                                    imageUrl={foll.user.imageUrl} />
+                                    userName={foll.following.userName}
+                                    imageUrl={foll.following.imageUrl} />
                             })
                         }
                     </div>
