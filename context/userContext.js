@@ -17,9 +17,22 @@ const UserContext = createContext();
 
 export const UserStateContext = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loginUser, setLoginUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
   const [token, setToken] = useState(null);
   return (
-    <UserContext.Provider value={{ user, token, setToken, setUser }}>
+    <UserContext.Provider
+      value={{
+        user,
+        token,
+        loginUser,
+        currentUser,
+        setToken,
+        setUser,
+        setLoginUser,
+        setCurrentUser
+      }}
+    >
       {children}
     </UserContext.Provider>
   );

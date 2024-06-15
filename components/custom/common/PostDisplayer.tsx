@@ -9,6 +9,7 @@ import { FiSend } from 'react-icons/fi';
 import { RxCross2 } from "react-icons/rx";
 import { timeDifference } from '@/utils/dataManipulator';
 import axios from 'axios';
+import { useUserState } from '@/context/userContext';
 
 interface PostUrl {
     id: string;
@@ -23,12 +24,12 @@ interface PostUrl {
 interface User {
     userName: string;
     name: string | null;
-    imageUrl: null;
+    imageUrl: string | null;
     postsCount: number;
     followerCount: number;
     followingCount: number;
-    bio: null;
-    id: null;
+    bio: string | null;
+    id: string;
 }
 
 interface Post {
@@ -124,7 +125,7 @@ const UserCommentBoxBar: React.FC<UserCommentBoxBarProps> = ({ post }) => {
 
 
     useEffect(() => {
-        const updatedAt: Date = new Date(post.updatedAt);
+        const updatedAt: Date = new Date(post.createdAt);
         const now: Date = new Date();
         const diffMs: number = now.getTime() - updatedAt.getTime();
         setTimeStringToShown(timeDifference(diffMs));
@@ -161,10 +162,14 @@ const UserCommentBoxBar: React.FC<UserCommentBoxBarProps> = ({ post }) => {
 }
 
 const PostDisplayer: React.FC<PostDisplayerProps> = ({ url, setPostDisplayerOn, post }) => {
+    const userStates = useUserState();
+    const user: User | null = userStates ? userStates.user : null;
     const [currentIdx, setCurrentIdx] = useState<number>(0);
     const [localTimeString, setLocalTimeString] = useState<string>("");
     const postContainerRef = useRef<HTMLDivElement>(null);
     const [allCommentsOfPosts, setAllCommentsOfPosts] = useState<Comment[]>([]);
+    const [userCommentString, setUserCommentString] = useState<string>("");
+
 
     const fetchAllCommentsOfGivenPostId = useCallback(async () => {
         if (!post)
@@ -176,6 +181,25 @@ const PostDisplayer: React.FC<PostDisplayerProps> = ({ url, setPostDisplayerOn, 
             setAllCommentsOfPosts(allCommentsOfPostsResponse.data.comments);
         }
     }, [post]);
+
+    const sendCommentOnPost = async () => {
+        try {
+            if (!user || !post)
+                return;
+            if(userCommentString === "")
+                return;
+            await axios.post(
+                `http://localhost:4000/api/upload/post/comment/${user.id}/${post.id}`,
+                {
+                    commentText: userCommentString
+                }
+            );
+            setUserCommentString("");
+            fetchAllCommentsOfGivenPostId();
+        } catch (error: any) {
+            console.log(error.message);
+        }
+    }
 
     useEffect(() => {
         if (!post)
@@ -319,8 +343,20 @@ const PostDisplayer: React.FC<PostDisplayerProps> = ({ url, setPostDisplayerOn, 
                         {/* input comment */}
                         <div className="p-3 border-t w-full flex gap-3 h-fit max-h-[80px] items-center">
                             <GrEmoji size={32} />
-                            <textarea placeholder='Add a comment...' rows={2} className='max-h-[80px] resize-none w-full outline-none bg-[#090909] text-[#dedededd]' />
-                            <button className='text-[#0095f6] font-semibold hover:text-[#dedede]'>Post</button>
+                            <textarea onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    sendCommentOnPost();
+                                }
+                            }} value={userCommentString} onChange={
+                                (e) => {
+                                    setUserCommentString(e.target.value);
+                                }
+                            } placeholder='Add a comment...' rows={2} className='max-h-[80px] resize-none w-full outline-none bg-[#090909] text-[#dedededd]' />
+                            <button className='text-[#0095f6] font-semibold hover:text-[#dedede]' onClick={
+                                (e) => {
+                                    sendCommentOnPost();
+                                }
+                            }>Post</button>
                         </div>
                     </div>
                 </div>

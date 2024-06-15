@@ -16,12 +16,12 @@ interface PostUrl {
 interface User {
     userName: string;
     name: string | null;
-    imageUrl: null;
+    imageUrl: string | null;
     postsCount: number;
     followerCount: number;
     followingCount: number;
-    bio: null;
-    id: null;
+    bio: string | null;
+    id: string;
 }
 
 interface Post {

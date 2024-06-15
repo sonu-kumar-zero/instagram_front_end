@@ -17,6 +17,8 @@ interface ProfilePageProps {
 
 const ProfilePage: React.FC<ProfilePageProps> = ({ userName }) => {
     const userStates = useUserState();
+    const [followAccepted, setFollowAccepted] = useState<boolean>(false);
+    const [isFollowRequestSended, setIsFollowRequestSended] = useState<boolean>(false);
     const realUser = userStates?.user;
 
     const [user, setUser] = useState({
@@ -30,22 +32,24 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userName }) => {
         id: null
     });
 
-    const func = useCallback(async () => {
+    const fetchdataOfCurrentUser = useCallback(async () => {
         const searchUserFromUserName = await axios.get(
             `http://localhost:4000/api/user/data/${userName}`
         );
         if (searchUserFromUserName.status === 200) {
             setUser((prev) => searchUserFromUserName.data.user);
+            userStates?.setCurrentUser(searchUserFromUserName.data.user);
         };
-    }, [userName]);
+    }, [userName, userStates?.setCurrentUser]);
 
     useEffect(() => {
         if (userStates?.user?.userName === userName) {
+            userStates?.setCurrentUser(userStates?.user);
             setUser(userStates?.user);
         } else {
-            func();
+            fetchdataOfCurrentUser();
         }
-    }, [func, userStates?.user, userName]);
+    }, [fetchdataOfCurrentUser, userStates?.user, userName]);
 
     const handleFriendRequestSend = async () => {
         try {
@@ -56,7 +60,33 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userName }) => {
         } catch (error: any) {
             console.log(error.message);
         }
-    }
+    };
+
+    const checkIsFollowAccepted = useCallback(async () => {
+        try {
+            if (!user || !user.id)
+                return;
+            if (!realUser || !realUser.id)
+                return;
+            const checkIsFollowAcceptedResponse = await axios.get(
+                `http://localhost:4000/api/user/follow/status/${realUser.id}/${user.id}`
+            );
+            if (checkIsFollowAcceptedResponse.status === 200) {
+                setIsFollowRequestSended(true);
+                setFollowAccepted(checkIsFollowAcceptedResponse.data.status.isAccepted);
+            }
+        } catch (error: any) {
+            console.log(error.message)
+        }
+    }, [user, realUser]);
+
+
+    useEffect(() => {
+        if (userName === realUser.userName)
+            return;
+        checkIsFollowAccepted();
+
+    }, [userName, realUser, checkIsFollowAccepted]);
 
     if (!user) {
         return <div>Loading...</div>;
@@ -85,7 +115,19 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userName }) => {
                                                     </button>
                                                 </> :
                                                 <>
-                                                    <button className="text-[#dedede] bg-[#0095f6] px-4 py-1 rounded-md" onClick={handleFriendRequestSend}>Follow</button>
+                                                    {
+                                                        isFollowRequestSended &&
+                                                        (
+                                                            followAccepted ?
+                                                                <div className="text-[#dedede] bg-[#56565666] px-4 py-1 rounded-md" >Following</div>
+                                                                :
+                                                                <div className="text-[#dedede] bg-[#56565666] px-4 py-1 rounded-md" >Follow Send</div>
+                                                        )
+                                                    }
+                                                    {
+                                                        !isFollowRequestSended &&
+                                                        <button className="text-[#dedede] bg-[#0095f6] px-4 py-1 rounded-md" onClick={handleFriendRequestSend}>Follow</button>
+                                                    }
                                                     <button className="">
                                                         <HiOutlineDotsHorizontal size={28} />
                                                     </button>
@@ -98,24 +140,55 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userName }) => {
                                         <span className='font-semibold'>{user.postsCount}</span>
                                         <span>post</span>
                                     </div>
-                                    <Link href={`/${user.userName}/followers`} className="flex gap-1 cursor-pointer">
-                                        <span className='font-semibold'>{user.followerCount}</span>
-                                        <span>followers</span>
-                                    </Link>
-                                    <Link href={`/${user.userName}/following`} className="flex gap-1 cursor-pointer">
-                                        <span className='font-semibold'>{user.followingCount}</span>
-                                        <span>following</span>
-                                    </Link>
+                                    {
+                                        userName === realUser?.userName
+                                            ?
+                                            <>
+                                                <Link href={`/${user.userName}/followers`} className="flex gap-1 cursor-pointer">
+                                                    <span className='font-semibold'>{user.followerCount}</span>
+                                                    <span>followers</span>
+                                                </Link>
+                                                <Link href={`/${user.userName}/following`} className="flex gap-1 cursor-pointer">
+                                                    <span className='font-semibold'>{user.followingCount}</span>
+                                                    <span>following</span>
+                                                </Link>
+                                            </>
+                                            :
+                                            (
+                                                followAccepted ?
+                                                    <>
+                                                        <Link href={`/${user.userName}/followers`} className="flex gap-1 cursor-pointer">
+                                                            <span className='font-semibold'>{user.followerCount}</span>
+                                                            <span>followers</span>
+                                                        </Link>
+                                                        <Link href={`/${user.userName}/following`} className="flex gap-1 cursor-pointer">
+                                                            <span className='font-semibold'>{user.followingCount}</span>
+                                                            <span>following</span>
+                                                        </Link>
+                                                    </>
+                                                    :
+                                                    <>
+                                                        <div className="flex gap-1 cursor-pointer">
+                                                            <span className='font-semibold'>{user.followerCount}</span>
+                                                            <span>followers</span>
+                                                        </div>
+                                                        <div className="flex gap-1 cursor-pointer">
+                                                            <span className='font-semibold'>{user.followingCount}</span>
+                                                            <span>following</span>
+                                                        </div>
+                                                    </>
+                                            )
+                                    }
                                 </div>
                                 <div className="">
                                     <div className="text-xs font-semibold">{user.name ? user.name : user.userName}</div>
                                     <pre className="text-sm break-all">{user.bio}</pre>
-                                    {/* <div className="text-xs">NSUT25</div> */}
                                 </div>
                             </div>
                         </div>
                         <div className=""></div>
                     </div>
+
                     <div className="flex px-5 gap-10 pt-5 pb-10 border-b border-[#dedede44]">
                         <div className="flex flex-col gap-4 items-center">
                             <div className="rounded-full p-1 bg-[#343434]">
@@ -133,16 +206,19 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userName }) => {
                             <MdGridOn />
                             <span className='font-semibold'>POSTS</span>
                         </Link>
-                        <Link href={`/${user.userName}/saved`} className='flex gap-3 items-center'>
-                            <FaRegBookmark />
-                            <span className='font-semibold'>SAVED</span>
-                        </Link>
+                        {
+                            realUser.userName === userName &&
+                            <Link href={`/${user.userName}/saved`} className='flex gap-3 items-center'>
+                                <FaRegBookmark />
+                                <span className='font-semibold'>SAVED</span>
+                            </Link>
+                        }
                         <Link href={`/${user.userName}/tagged`} className='flex gap-3 items-center'>
                             <BsPersonSquare />
                             <span className='font-semibold'>TAGGED</span>
                         </Link>
                     </div>
-                </div>
+                </div >
             }
         </>
     )

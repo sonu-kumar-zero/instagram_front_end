@@ -17,12 +17,13 @@ interface PostUrl {
 interface User {
     userName: string;
     name: string | null;
-    imageUrl: null;
+    imageUrl: string | null;
     postsCount: number;
     followerCount: number;
     followingCount: number;
-    bio: null;
-    id: null;
+    bio: string | null;
+    id: string;
+    profileType: string;
 }
 
 interface Post {
@@ -42,25 +43,50 @@ interface Post {
     user: User;
 }
 
-
 interface PicturePageProps {
     userName?: string
 }
 
 const PicturePage: React.FC<PicturePageProps> = ({ userName }) => {
     const userStates = useUserState();
-    const user = userStates ? userStates.user : null;
+    const realUser: User | null = userStates ? userStates.user : null;
+    const currentUser: User | null = userStates ? userStates.currentUser : null;
     const [userPosts, setUserPosts] = useState<Post[]>([]);
 
     const fetchUserPosts = useCallback(async () => {
-        if (!user) {
-            return;
+        try {
+            if (realUser && realUser.userName === userName) {
+                const userPostsResponse = await axios.get(`http://localhost:4000/api/upload/post/${realUser.id}`);
+                if (userPostsResponse.status === 200) {
+                    setUserPosts(userPostsResponse.data.allPosts);
+                };
+            } else if (realUser && currentUser) {
+                if (currentUser.profileType === "PUBLIC") {
+                    const userPostsResponse = await axios.get(`http://localhost:4000/api/upload/post/${currentUser.id}`);
+                    if (userPostsResponse.status === 200) {
+                        setUserPosts(userPostsResponse.data.allPosts);
+                    };
+                } else {
+                    const checkIsFollowAcceptedResponse = await axios.get(
+                        `http://localhost:4000/api/user/follow/status/${realUser.id}/${currentUser.id}`
+                    );
+                    if (checkIsFollowAcceptedResponse.status === 200) {
+                        if (checkIsFollowAcceptedResponse.data.status.isAccepted) {
+                            const userPostsResponse = await axios.get(`http://localhost:4000/api/upload/post/${currentUser.id}`);
+                            if (userPostsResponse.status === 200) {
+                                setUserPosts(userPostsResponse.data.allPosts);
+                            };
+                        } else {
+                            setUserPosts([]);
+                        }
+                    }
+                }
+            }
+        } catch (error: any) {
+            console.log(error.message);
+            setUserPosts([]);
         }
-        const userPostsResponse = await axios.get(`http://localhost:4000/api/upload/post/${user.id}`);
-        if (userPostsResponse.status === 200) {
-            setUserPosts(userPostsResponse.data.allPosts);
-        }
-    }, [user])
+    }, [realUser, userName, currentUser])
 
     useEffect(() => {
         fetchUserPosts();

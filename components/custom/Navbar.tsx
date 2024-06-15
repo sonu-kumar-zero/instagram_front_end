@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { GoHome } from "react-icons/go";
 import { IoSearch } from "react-icons/io5";
 import { FaRegCompass, FaRegHeart } from "react-icons/fa";
@@ -87,11 +87,26 @@ interface NavbBarProps {
     uploadBoxEnabled: boolean;
 }
 
-const NormalNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled,setUploadBoxEnabled }) => {
+const NormalNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, setUploadBoxEnabled }) => {
     const userState = useUserState();
     const user = userState ? userState.user : null;
+    const normalNavbarRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClick = (e: any) => {
+            if (!normalNavbarRef.current?.contains(e.target)) {
+                setSearchBoxEnabled(false);
+            }
+        }
+        document.addEventListener("click", handleClick);
+
+        return () => {
+            document.removeEventListener("click", handleClick);
+        }
+    }, [setSearchBoxEnabled]);
+
     return (
-        <div className='p-5 px-3 min-w-[250px] w-[250px] flex flex-col bg-[#101010] border-r border-[#ddd] border-opacity-20 justify-between h-full'>
+        <div ref={normalNavbarRef} className='navbar_box p-5 px-3 min-w-[250px] w-[250px] flex flex-col bg-[#101010] border-r border-[#ddd] border-opacity-20 justify-between h-full'>
             <div className="flex flex-col">
                 <div className="h-[50px] w-fit">
                     <Link href={"/"} className="text-2xl px-2 py-5 cursor-pointer">
@@ -122,10 +137,10 @@ const NormalNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled,setUploadBox
                         })
                     }
                     <button className="flex gap-3 py-3 px-2 items-center rounded-lg cursor-pointer hover:bg-[#232323] border border-[#dedede00]" onClick={
-                        ()=>{
+                        () => {
                             setUploadBoxEnabled(true)
                         }
-                        }>
+                    }>
                         <div className="text-[28px] px-[2px] w-[34px]">
                             <BiAddToQueue />
                         </div>
@@ -169,12 +184,27 @@ const NormalNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled,setUploadBox
 }
 
 
-const SimpleNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, serachBoxEnabled, setUploadBoxEnabled}) => {
+const SimpleNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, serachBoxEnabled, setUploadBoxEnabled }) => {
     const userState = useUserState();
     const user = userState ? userState.user : null;
+    const simpleNavbarRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClick = (e: any) => {
+            if (!simpleNavbarRef.current?.contains(e.target)) {
+                setSearchBoxEnabled(false);
+            }
+        }
+        document.addEventListener("click", handleClick);
+
+        return () => {
+            document.removeEventListener("click", handleClick);
+        }
+    }, [setSearchBoxEnabled]);
+
     return (
         <>
-            <div className="min-w-[250px] w-[250px] relative">
+            <div ref={simpleNavbarRef} className="navbar_box min-w-[250px] w-[250px] relative">
                 <div className='p-5 px-3 min-w-fit w-fit flex flex-col bg-[#101010] border-r border-[#ddd] border-opacity-20 justify-between h-full'>
                     <div className="flex flex-col">
                         <div className="h-[50px] w-fit ">
@@ -250,21 +280,21 @@ const Navbar = () => {
         <>
             {
                 serachBoxEnabled ?
-                    <SimpleNavbar 
-                        setSearchBoxEnabled={setSearchBoxEnabled} 
+                    <SimpleNavbar
+                        setSearchBoxEnabled={setSearchBoxEnabled}
                         serachBoxEnabled={serachBoxEnabled}
                         uploadBoxEnabled={uploadBoxEnabled}
                         setUploadBoxEnabled={setUploadBoxEnabled} />
                     :
-                    <NormalNavbar 
-                        setSearchBoxEnabled={setSearchBoxEnabled} 
-                        serachBoxEnabled={serachBoxEnabled} 
+                    <NormalNavbar
+                        setSearchBoxEnabled={setSearchBoxEnabled}
+                        serachBoxEnabled={serachBoxEnabled}
                         uploadBoxEnabled={uploadBoxEnabled}
                         setUploadBoxEnabled={setUploadBoxEnabled}
                     />
             }
             {
-                uploadBoxEnabled && <ImageUploader setUploadBoxEnabled={setUploadBoxEnabled}/>
+                uploadBoxEnabled && <ImageUploader setUploadBoxEnabled={setUploadBoxEnabled} />
             }
         </>
     )

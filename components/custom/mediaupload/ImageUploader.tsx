@@ -614,8 +614,8 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadBoxEnabled }) =>
 
                                     <div className="px-5 rounded-br-xl border-l border-[#454545]">
                                         <div className="flex py-3 gap-2 items-center">
-                                            <Image src={"/images/sonu_profile.jpeg"} alt='profile_icon' width={100} height={100} className='w-[30px] h-[30px] object-cover rounded-full' />
-                                            <div className="text-sm font-semibold">starksonu12</div>
+                                            <Image src={user ? `http://127.0.0.1:8000/uploads/profile/${user?.imageUrl}/300_300.jpg` : "/images/sonu_profile.jpeg"} alt='profile_icon' width={100} height={100} className='w-[30px] h-[30px] object-cover rounded-full' />
+                                            <div className="text-sm font-semibold">{user ? user.userName:"userName"}</div>
                                         </div>
                                         <textarea value={postDescription} onChange={
                                             (e) => {
@@ -652,7 +652,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadBoxEnabled }) =>
                                             You can change this later by going to the ... menu at the top of your post.
                                         </div>
                                         <div className="flex justify-end py-5">
-                                            <button className='bg-[#0095f6] px-5 py-2 rounded-xl' onClick={()=>{handlePostUpload({user,files,propertList,postDescription})}}>Upload Post</button>
+                                            <button className='bg-[#0095f6] px-5 py-2 rounded-xl' onClick={() => { handlePostUpload({ user, files, propertList, postDescription }) }}>Upload Post</button>
                                         </div>
                                     </div>
                                 </div>
