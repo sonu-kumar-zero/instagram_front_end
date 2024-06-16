@@ -106,7 +106,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userName }) => {
                                     <div className="">{user.userName}</div>
                                     <div className="flex gap-2 text-sm">
                                         {
-                                            userName === realUser?.userName ?
+                                            (realUser && userName === realUser?.userName) ?
                                                 <>
                                                     <Link href={"/accounts"} className="bg-[#56565666] px-4 py-1 rounded-md">Edit profile</Link>
                                                     <button className="bg-[#56565666] px-4 py-1 rounded-md">View archive</button>
@@ -121,7 +121,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userName }) => {
                                                             followAccepted ?
                                                                 <div className="text-[#dedede] bg-[#56565666] px-4 py-1 rounded-md" >Following</div>
                                                                 :
-                                                                <div className="text-[#dedede] bg-[#56565666] px-4 py-1 rounded-md" >Follow Send</div>
+                                                                <div className="text-[#dedede] bg-[#56565666] px-4 py-1 rounded-md" >Requested</div>
                                                         )
                                                     }
                                                     {

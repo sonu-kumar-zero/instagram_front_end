@@ -51,7 +51,7 @@ interface PostsGridChildProps {
 const PostsGridChild: React.FC<PostsGridChildProps> = ({ url, big, post, height = "h-full" }) => {
     const [overLayShow, SetOverLayShow] = useState<boolean>(false);
     const [postDisplayerOn, setPostDisplayerOn] = useState<boolean>(false);
-    
+
     return (
         <>
             <div className={

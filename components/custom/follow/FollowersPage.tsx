@@ -26,19 +26,21 @@ const FollowersPage = () => {
     const [allFollowers, setAllFollowers] = useState<FollowerUserType[]>([]);
     const userStates = useUserState();
     const user = userStates ? userStates.user : null;
+    const currentUser = userStates ? userStates.currentUser : null;
 
     // we will implement pagination in it later 
     const fetchAllFollowersOfUsers = useCallback(async () => {
-        if (!user.id)
+        if (!currentUser.id)
             return
+
         const allFollowersOfUsersByUserIdResponse = await axios.get(
-            `http://localhost:4000/api/user/follow/follower/${user.id}`
+            `http://localhost:4000/api/user/follow/follower/${currentUser.id}`
         );
 
         if (allFollowersOfUsersByUserIdResponse.status === 200) {
             setAllFollowers((prev) => (allFollowersOfUsersByUserIdResponse.data.users));
         };
-    }, [user?.id]);
+    }, [currentUser?.id]);
 
     useEffect(() => {
         fetchAllFollowersOfUsers();
@@ -50,7 +52,7 @@ const FollowersPage = () => {
                 <div className="w-[400px] rounded-xl bg-[#454545]">
                     <div className="relative p-3 border-b border-[#494949]">
                         <div className="absolute left-1/2 -translate-x-1/2 font-semibold">Followers</div>
-                        <Link href={`/${user.userName}`} className='absolute right-3'>
+                        <Link href={`/${currentUser.userName}`} className='absolute right-3'>
                             <RxCross2 size={24} />
                         </Link>
                     </div>

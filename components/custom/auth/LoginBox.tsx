@@ -41,6 +41,8 @@ const LoginBox: React.FC<LoginBoxProps> = () => {
     };
     const loginHandler = async () => {
         try {
+            if (!userStates)
+                return;
             console.log(formData);
             const loginRespose = await axios.post(`http://127.0.0.1:4000/api/user/login`, {
                 ...formData
@@ -66,6 +68,19 @@ const LoginBox: React.FC<LoginBoxProps> = () => {
                         postsCount: user.postsCount,
                     }
                 );
+                userStates.setLoginUser(
+                    {
+                        userName: user.userName,
+                        id: user.id,
+                        bio: user.bio,
+                        email: user.email,
+                        followerCount: user.followerCount,
+                        followingCount: user.followingCount,
+                        imageUrl: user.imageUrl,
+                        name: user.name,
+                        postsCount: user.postsCount,
+                    }
+                )
                 userStates.setToken(token);
                 router.push("/");
             }

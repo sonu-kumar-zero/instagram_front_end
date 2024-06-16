@@ -95,40 +95,6 @@ const ImageCanvasUploader: React.FC<ImageCanvasUploaderProps> = ({ imageSrc, pro
 
     }, [imageSrc, canvasRef, currentIdx, propertList]);
 
-
-
-    const handleSendToServer = async () => {
-        // const canvas = canvasRef.current;
-        // if (canvas && files) {
-        //     for (const file of Array.from(files)) {
-        //         const ctx = canvas.getContext('2d');
-        //         const img = new Image();
-        //         const url = URL.createObjectURL(file);
-        //         img.src = url;
-        //         await new Promise<void>((resolve) => {
-        //             img.onload = () => {
-        //                 ctx?.clearRect(0, 0, canvas.width, canvas.height);
-        //                 ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
-        //                 URL.revokeObjectURL(url);
-        //                 canvas.toBlob(async (blob) => {
-        //                     if (blob) {
-        //                         const formData = new FormData();
-        //                         formData.append('image', blob, 'canvas-image.png');
-        //                         await fetch('/api/upload', {
-
-        //                             method: 'POST',
-        //                             body: formData,
-        //                         });
-        //                     }
-        //                     resolve();
-        //                 }, 'image/png');
-        //             };
-        //         });
-        //     }
-        // }
-    };
-
-
     return (
         <>
             <div className="relative">

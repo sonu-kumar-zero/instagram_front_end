@@ -34,19 +34,21 @@ const FollowingPage = () => {
     const [allFollowings, setAllFollowings] = useState<FollowerUserType[]>([]);
     const userStates = useUserState();
     const user = userStates ? userStates.user : null;
+    const currentUser = userStates ? userStates.currentUser : null;
+
 
     const fetchAllFollowingsOfUsers = useCallback(async () => {
-        if (!user.id)
+        if (!currentUser.id)
             return;
         const allFollowersOfUsersByUserIdResponse = await axios.get(
-            `http://localhost:4000/api/user/follow/following/${user.id}`
+            `http://localhost:4000/api/user/follow/following/${currentUser.id}`
         );
 
         if (allFollowersOfUsersByUserIdResponse.status === 200) {
             setAllFollowings((prev) => (allFollowersOfUsersByUserIdResponse.data.users));
         }
 
-    }, [user?.id]);
+    }, [currentUser?.id]);
 
     useEffect(() => {
         fetchAllFollowingsOfUsers();
@@ -58,7 +60,7 @@ const FollowingPage = () => {
                 <div className="w-[400px] rounded-xl bg-[#454545]">
                     <div className="relative p-3 border-b border-[#494949]">
                         <div className="absolute left-1/2 -translate-x-1/2 font-semibold">Following</div>
-                        <Link href={`/${user.userName}`} className='absolute right-3'>
+                        <Link href={`/${currentUser.userName}`} className='absolute right-3'>
                             <RxCross2 size={24} />
                         </Link>
                     </div>

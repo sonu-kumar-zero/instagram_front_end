@@ -2,6 +2,7 @@
 import React from 'react';
 import axios from "axios";
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface FollowerBarProps {
     userName: string,
@@ -29,7 +30,7 @@ const FollowerBar: React.FC<FollowerBarProps> = ({ userName, name, userId, follo
     return (
         <>
             <div className="hover:bg-[#565656] w-full p-3 flex justify-between items-center">
-                <div className="flex gap-2 items-center cursor-pointer">
+                <Link href={`/${userName}`} className="flex gap-2 items-center cursor-pointer">
                     <div className="">
                         <Image
                             src={
@@ -46,7 +47,7 @@ const FollowerBar: React.FC<FollowerBarProps> = ({ userName, name, userId, follo
                         <div className="">{userName}</div>
                         <div className="text-xs">{name}</div>
                     </div>
-                </div>
+                </Link>
                 <div className="">
                     {
                         isAccepted ?
