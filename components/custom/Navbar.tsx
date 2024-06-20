@@ -18,6 +18,7 @@ import Link from 'next/link';
 import { useUserState } from '@/context/userContext';
 import SearchView from '@/components/custom/search/SearchView';
 import ImageUploader from '@/components/custom/mediaupload/ImageUploader';
+import { usePathname } from 'next/navigation';
 
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -85,9 +86,11 @@ interface NavbBarProps {
     serachBoxEnabled: boolean;
     setUploadBoxEnabled: React.Dispatch<React.SetStateAction<boolean>>;
     uploadBoxEnabled: boolean;
+    simpleNavbarOn: boolean;
+    setSimpleNavbarOn: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const NormalNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, setUploadBoxEnabled }) => {
+const NormalNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, setUploadBoxEnabled, setSimpleNavbarOn }) => {
     const userState = useUserState();
     const user = userState ? userState.user : null;
     const normalNavbarRef = useRef<HTMLDivElement>(null);
@@ -96,6 +99,7 @@ const NormalNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, setUploadBo
         const handleClick = (e: any) => {
             if (!normalNavbarRef.current?.contains(e.target)) {
                 setSearchBoxEnabled(false);
+                setSimpleNavbarOn(false);
             }
         }
         document.addEventListener("click", handleClick);
@@ -103,13 +107,15 @@ const NormalNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, setUploadBo
         return () => {
             document.removeEventListener("click", handleClick);
         }
-    }, [setSearchBoxEnabled]);
+    }, [setSearchBoxEnabled, setSimpleNavbarOn]);
 
     return (
         <div ref={normalNavbarRef} className='navbar_box p-5 px-3 min-w-[250px] w-[250px] flex flex-col bg-[#101010] border-r border-[#ddd] border-opacity-20 justify-between h-full'>
             <div className="flex flex-col">
                 <div className="h-[50px] w-fit">
-                    <Link href={"/"} className="text-2xl px-2 py-5 cursor-pointer">
+                    <Link href={"/"} className="text-2xl px-2 py-5 cursor-pointer" onClick={() => {
+                        setSimpleNavbarOn(false);
+                    }}>
                         Instagram
                     </Link>
                 </div>
@@ -121,6 +127,10 @@ const NormalNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, setUploadBo
                                     (e) => {
                                         if (opt.icon === "search") {
                                             setSearchBoxEnabled(true);
+                                            setSimpleNavbarOn(true);
+                                        };
+                                        if (opt.icon === "home") {
+                                            setSimpleNavbarOn(false);
                                         }
                                     }
                                 } >
@@ -184,15 +194,16 @@ const NormalNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, setUploadBo
 }
 
 
-const SimpleNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, serachBoxEnabled, setUploadBoxEnabled }) => {
+const SimpleNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, serachBoxEnabled, setUploadBoxEnabled, setSimpleNavbarOn }) => {
     const userState = useUserState();
     const user = userState ? userState.user : null;
     const simpleNavbarRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const handleClick = (e: any) => {
-            if (!simpleNavbarRef.current?.contains(e.target)) {
+            if (simpleNavbarRef.current?.contains(e.target)) {
                 setSearchBoxEnabled(false);
+                setSimpleNavbarOn(false);
             }
         }
         document.addEventListener("click", handleClick);
@@ -200,11 +211,11 @@ const SimpleNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, serachBoxEn
         return () => {
             document.removeEventListener("click", handleClick);
         }
-    }, [setSearchBoxEnabled]);
+    }, [setSearchBoxEnabled, setSimpleNavbarOn]);
 
     return (
         <>
-            <div ref={simpleNavbarRef} className="navbar_box min-w-[250px] w-[250px] relative">
+            <div ref={simpleNavbarRef} className="navbar_box min-w-[75px] w-[75px] relative">
                 <div className='p-5 px-3 min-w-fit w-fit flex flex-col bg-[#101010] border-r border-[#ddd] border-opacity-20 justify-between h-full'>
                     <div className="flex flex-col">
                         <div className="h-[50px] w-fit ">
@@ -220,6 +231,7 @@ const SimpleNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, serachBoxEn
                                             (e) => {
                                                 if (opt.icon === "search") {
                                                     setSearchBoxEnabled(false);
+                                                    setSimpleNavbarOn(false);
                                                 }
                                             }
                                         }>
@@ -265,7 +277,10 @@ const SimpleNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, serachBoxEn
                         </div>
                     </div>
                 </div>
-                <SearchView />
+                {
+                    serachBoxEnabled &&
+                    <SearchView />
+                }
             </div>
         </>
     )
@@ -275,18 +290,30 @@ const Navbar = () => {
 
     const [serachBoxEnabled, setSearchBoxEnabled] = useState<boolean>(false);
     const [uploadBoxEnabled, setUploadBoxEnabled] = useState<boolean>(false);
+    const [simpleNavbarOn, setSimpleNavbarOn] = useState<boolean>(false);
+
+    const currentRoute = usePathname();
+    if (currentRoute) {
+        if (currentRoute.startsWith("/direct") && !simpleNavbarOn) {
+            setSimpleNavbarOn(true);
+        };
+    }
 
     return (
         <>
             {
-                serachBoxEnabled ?
+                simpleNavbarOn ?
                     <SimpleNavbar
+                        simpleNavbarOn={simpleNavbarOn}
+                        setSimpleNavbarOn={setSimpleNavbarOn}
                         setSearchBoxEnabled={setSearchBoxEnabled}
                         serachBoxEnabled={serachBoxEnabled}
                         uploadBoxEnabled={uploadBoxEnabled}
                         setUploadBoxEnabled={setUploadBoxEnabled} />
                     :
                     <NormalNavbar
+                        simpleNavbarOn={simpleNavbarOn}
+                        setSimpleNavbarOn={setSimpleNavbarOn}
                         setSearchBoxEnabled={setSearchBoxEnabled}
                         serachBoxEnabled={serachBoxEnabled}
                         uploadBoxEnabled={uploadBoxEnabled}
