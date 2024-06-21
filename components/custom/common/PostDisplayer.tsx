@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { use, useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { IoEllipsisHorizontal } from "react-icons/io5";
 import { GrEmoji } from "react-icons/gr";
@@ -61,6 +61,7 @@ interface Comment {
     createdAt: string;
     updatedAt: string;
     user: User;
+    parentCommentId: string | null;
 }
 
 interface PostDisplayerProps {
@@ -72,29 +73,90 @@ interface PostDisplayerProps {
 interface UserCommentBoxBarProps {
     post: Post
 }
+
 interface CommentBoxBarProps {
-    comment: Comment,
-    user: User | null,
-    post?: Post
+    comment: Comment;
+    user: User | null;
+    post?: Post;
+    setParrentCommentId: React.Dispatch<React.SetStateAction<string | null>>;
+    setParrentCommentUserName: React.Dispatch<React.SetStateAction<string | null>>
 }
 
-const CommentBoxBar: React.FC<CommentBoxBarProps> = ({ comment, user, post }) => {
+const CommentBoxBar: React.FC<CommentBoxBarProps> = ({ comment, user, post, setParrentCommentId, setParrentCommentUserName }) => {
     const [commentBoxBarTimeString, setCommentBoxBarTimeString] = useState<string>("");
     const [showMoreOptionsButton, setShowMoreOptionsButton] = useState<boolean>(false);
     const [showMoreOptions, setShowMoreOptions] = useState<boolean>(false);
+    const [commentReplies, setCommentReplies] = useState<Comment[]>([]);
+    const [showAllComments, setShowAllComments] = useState<boolean>(false);
+    const [likeOnThisCommentByUser, setLikeOnThisCommentByUser] = useState<boolean>(false);
 
     const deleteThisComment = async () => {
         try {
             if (!user)
                 return;
             await axios.delete(
-                `http://localhost:4000/api/upload/post/comment/${user.id}/${comment.postId}/${comment.id}`
+                `http://localhost:4000/api/upload/post/comment/${user.id}/${comment.postId}/${comment.id}`,
+                {
+                    data: {
+                        parentCommentId: comment.parentCommentId
+                    }
+                }
             );
         } catch (error: any) {
             console.log(error.message);
         }
     }
 
+    const fetchAllRepliesOfThisComment = async () => {
+        try {
+            if (!comment)
+                return;
+            const allRepliesOfThisCommentResponse = await axios.get(
+                `http://localhost:4000/api/upload/post/comment/commentoncomment/${comment.id}`
+            );
+            if (allRepliesOfThisCommentResponse.status === 200) {
+                setCommentReplies(allRepliesOfThisCommentResponse.data.comment);
+            } else {
+                setCommentReplies([]);
+            }
+        } catch (error: any) {
+            console.log(error.message);
+            setCommentReplies([]);
+        }
+    }
+
+    const fetchStatusOfLikeOnComment = useCallback(async () => {
+        try {
+            if (!user || !comment)
+                return;
+            const fetchStatusOfLikeOnCommentResponse = await axios.get(
+                `http://localhost:4000/api/upload/post/comment/like/${user.id}/${comment.id}`
+            );
+            console.log(fetchStatusOfLikeOnCommentResponse)
+            if (fetchStatusOfLikeOnCommentResponse.status === 200) {
+                setLikeOnThisCommentByUser(fetchStatusOfLikeOnCommentResponse.data.like);
+            };
+
+        } catch (error: any) {
+            console.log(error.message);
+        }
+    }, [user, comment]);
+
+    const toggleLikeOnComment = async () => {
+        try {
+            if (!user || !comment)
+                return;
+            const toggleLikeOnPostResponse = await axios.post(
+                `http://localhost:4000/api/upload/post/comment/like/${user.id}/${comment.id}`
+            );
+
+            if (toggleLikeOnPostResponse.status === 200)
+                fetchStatusOfLikeOnComment();
+
+        } catch (error: any) {
+            console.log(error.message);
+        }
+    }
 
     useEffect(() => {
         const updatedAt: Date = new Date(comment.updatedAt);
@@ -102,6 +164,10 @@ const CommentBoxBar: React.FC<CommentBoxBarProps> = ({ comment, user, post }) =>
         const diffMs: number = now.getTime() - updatedAt.getTime();
         setCommentBoxBarTimeString(timeDifference(diffMs));
     }, [comment]);
+
+    useEffect(() => {
+        fetchStatusOfLikeOnComment();
+    }, [fetchStatusOfLikeOnComment])
 
     return (
         <>
@@ -131,7 +197,12 @@ const CommentBoxBar: React.FC<CommentBoxBarProps> = ({ comment, user, post }) =>
                         <div className="flex gap-3 text-xs">
                             <button className="hover:text-gray-400 text-gray-500">{commentBoxBarTimeString}</button>
                             <button className="hover:text-gray-400 text-gray-500">{comment.likesCount} likes</button>
-                            <button className="hover:text-gray-400 text-gray-500">Reply</button>
+                            <button className="hover:text-gray-400 text-gray-500" onClick={
+                                () => {
+                                    setParrentCommentId(comment.id);
+                                    setParrentCommentUserName(comment.user.userName);
+                                }
+                            }>Reply</button>
                             {
                                 showMoreOptionsButton &&
                                 <button className="hover:text-gray-400 text-gray-500" onClick={
@@ -145,10 +216,58 @@ const CommentBoxBar: React.FC<CommentBoxBarProps> = ({ comment, user, post }) =>
                         </div>
                     </div>
                 </div>
-                <button className="pt-3 h-fit pr-2">
-                    <FaRegHeart />
+                <button className="pt-3 h-fit pr-2" onClick={() => {
+                    toggleLikeOnComment();
+                }}>
+                    {
+                        likeOnThisCommentByUser ?
+                            <svg aria-label="Unlike" fill="#ff0000" height="24" role="img" viewBox="0 0 48 48" width="24">
+                                <title>Unlike</title>
+                                <path d="M34.6 3.1c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.1 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5s1.1-.2 1.6-.5c1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z"></path>
+                            </svg>
+                            :
+                            <svg aria-label="Like" fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">
+                                <title>Like</title>
+                                <path d="M16.792 3.904A4.989 4.989 0 0 1 21.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 0 1 4.708-5.218 4.21 4.21 0 0 1 3.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 0 1 3.679-1.938m0-2a6.04 6.04 0 0 0-4.797 2.127 6.052 6.052 0 0 0-4.787-2.127A6.985 6.985 0 0 0 .5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 0 0 3.518 3.018 2 2 0 0 0 2.174 0 45.263 45.263 0 0 0 3.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 0 0-6.708-7.218Z"></path>
+                            </svg>
+                    }
+
                 </button>
             </div>
+
+            {
+                comment.commentCount !== 0 && !showAllComments &&
+                <div className='pl-[64px] text-sm text-[#454545]'>
+                    <button onClick={
+                        () => {
+                            fetchAllRepliesOfThisComment();
+                            setShowAllComments(true);
+                        }
+                    } className="text-sm text-[#454545]">View Replies</button> ({comment.commentCount})
+                </div>
+            }
+            {
+                comment.commentCount !== 0 && showAllComments &&
+                <div className='pl-[64px] text-sm text-[#454545]'>
+                    <button onClick={
+                        () => {
+                            setShowAllComments(false);
+                        }
+                    } className='text-sm text-[#454545]'>Hide Replies</button>
+                </div>
+            }
+            {
+                showAllComments &&
+                (
+                    <div className='pl-[64px]'>
+                        {commentReplies.map((replie) => {
+                            return (
+                                <CommentBoxBar key={replie.id} comment={replie} setParrentCommentId={setParrentCommentId} setParrentCommentUserName={setParrentCommentUserName} user={user} post={post} />
+                            )
+                        })}
+                    </div>
+                )
+            }
             {
                 showMoreOptions &&
                 (
@@ -228,7 +347,8 @@ const PostDisplayer: React.FC<PostDisplayerProps> = ({ url, setPostDisplayerOn, 
     const [userCommentString, setUserCommentString] = useState<string>("");
     const [likeOnThisPostByUser, setLikeOnThisPostByUser] = useState<boolean>(false);
     const [isEmojiBoardOpen, setIsEmojiBoardOpen] = useState<boolean>(false);
-
+    const [parrentCommentId, setParrentCommentId] = useState<string | null>(null);
+    const [parrentCommentUserName, setParrentCommentUserName] = useState<string | null>(null);
 
     const toggleLikeOnPost = async () => {
         try {
@@ -252,10 +372,15 @@ const PostDisplayer: React.FC<PostDisplayerProps> = ({ url, setPostDisplayerOn, 
                 return;
             if (userCommentString === "")
                 return;
+            let userComment = userCommentString;
+            if (parrentCommentUserName) {
+                userComment = userCommentString.replace("@" + parrentCommentUserName + " ", "");
+            };
             await axios.post(
                 `http://localhost:4000/api/upload/post/comment/${user.id}/${post.id}`,
                 {
-                    commentText: userCommentString
+                    commentText: userComment,
+                    parentCommentId: parrentCommentId
                 }
             );
             setUserCommentString("");
@@ -272,6 +397,7 @@ const PostDisplayer: React.FC<PostDisplayerProps> = ({ url, setPostDisplayerOn, 
             `http://localhost:4000/api/upload/post/comment/${post.id}`
         );
         if (allCommentsOfPostsResponse.status === 200) {
+            console.log(allCommentsOfPostsResponse.data.comments);
             setAllCommentsOfPosts(allCommentsOfPostsResponse.data.comments);
         }
     }, [post]);
@@ -310,6 +436,19 @@ const PostDisplayer: React.FC<PostDisplayerProps> = ({ url, setPostDisplayerOn, 
         const readableDate: string = updatedAt.toLocaleDateString('en-US', options);
         setLocalTimeString(readableDate)
     }, [post]);
+
+    useEffect(() => {
+        if (userCommentString === "") {
+            setParrentCommentId(null);
+            setParrentCommentUserName(null);
+        }
+    }, [userCommentString]);
+
+    useEffect(() => {
+        if (parrentCommentUserName) {
+            setUserCommentString("@" + parrentCommentUserName + " ");
+        }
+    }, [parrentCommentUserName]);
 
     const scrollLeft = (e: React.MouseEvent<HTMLButtonElement>) => {
         if (!postContainerRef)
@@ -410,7 +549,7 @@ const PostDisplayer: React.FC<PostDisplayerProps> = ({ url, setPostDisplayerOn, 
                             {
                                 allCommentsOfPosts.map((comment) => {
                                     return (
-                                        <CommentBoxBar key={comment.id} comment={comment} user={user} post={post} />
+                                        <CommentBoxBar key={comment.id} comment={comment} user={user} post={post} setParrentCommentId={setParrentCommentId} setParrentCommentUserName={setParrentCommentUserName} />
                                     )
                                 })
                             }
@@ -465,15 +604,26 @@ const PostDisplayer: React.FC<PostDisplayerProps> = ({ url, setPostDisplayerOn, 
                                     <EmojiBoard setIsEmojiBoardOpen={setIsEmojiBoardOpen} setUserCommentString={setUserCommentString} />
                                 </div>
                             }
-                            <textarea onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                    sendCommentOnPost();
-                                }
-                            }} value={userCommentString} onChange={
+                            <textarea onKeyDown={
                                 (e) => {
-                                    setUserCommentString(e.target.value);
+                                    console.log(e.key);
+                                    if (e.key === "Enter") {
+                                        sendCommentOnPost();
+                                    } else if (e.key === "Backspace") {
+                                        if (userCommentString === "@" + parrentCommentUserName) {
+                                            setUserCommentString("");
+                                        }
+                                    }
+                                }}
+                                value={userCommentString}
+                                onChange={
+                                    (e) => {
+                                        setUserCommentString(e.target.value);
+                                    }
                                 }
-                            } placeholder='Add a comment...' rows={2} className='max-h-[80px] resize-none w-full outline-none bg-[#090909] text-[#dedededd]' />
+                                placeholder='Add a comment...'
+                                rows={2}
+                                className='max-h-[80px] resize-none w-full outline-none bg-[#090909] text-[#dedededd]' />
                             <button className='text-[#0095f6] font-semibold hover:text-[#dedede]' onClick={
                                 (e) => {
                                     sendCommentOnPost();

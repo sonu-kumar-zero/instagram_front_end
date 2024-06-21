@@ -47,7 +47,7 @@ const SearchView = () => {
     return (
         <>
             <div
-                className={`absolute top-0 left-[76px] w-[30dvw] h-[100dvh] bg-[#101010] z-10 simple_navbar rounded-r-xl flex flex-col`}>
+                className={`w-[30dvw] h-[100dvh] bg-[#101010] simple_navbar rounded-r-xl flex flex-col`}>
                 <div className="border-b border-[#dedede77] px-4 py-6 flex flex-col gap-8">
                     <div className="text-xl font-semibold">Search</div>
                     <div className="flex w-full rounded-lg  bg-[#232323] p-3">

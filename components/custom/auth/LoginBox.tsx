@@ -4,6 +4,10 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { useUserState } from '@/context/userContext';
 
+enum ProfileType {
+    PUBLIC,
+    PRIVATE
+}
 
 interface UserProps {
     id: string;
@@ -15,6 +19,7 @@ interface UserProps {
     imageUrl: string | null;
     name: string | null;
     postsCount: number;
+    profileType: ProfileType
 }
 
 interface LoginBoxProps {
@@ -66,6 +71,7 @@ const LoginBox: React.FC<LoginBoxProps> = () => {
                         imageUrl: user.imageUrl,
                         name: user.name,
                         postsCount: user.postsCount,
+                        profileType: user.profileType
                     }
                 );
                 userStates.setLoginUser(

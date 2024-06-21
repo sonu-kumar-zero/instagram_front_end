@@ -198,13 +198,14 @@ const SimpleNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, serachBoxEn
     const userState = useUserState();
     const user = userState ? userState.user : null;
     const simpleNavbarRef = useRef<HTMLDivElement>(null);
+    const searchViewRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const handleClick = (e: any) => {
-            if (simpleNavbarRef.current?.contains(e.target)) {
+            if (simpleNavbarRef.current?.contains(e.target) || !searchViewRef.current?.contains(e.target)) {
                 setSearchBoxEnabled(false);
                 setSimpleNavbarOn(false);
-            }
+            };
         }
         document.addEventListener("click", handleClick);
 
@@ -215,71 +216,79 @@ const SimpleNavbar: React.FC<NavbBarProps> = ({ setSearchBoxEnabled, serachBoxEn
 
     return (
         <>
-            <div ref={simpleNavbarRef} className="navbar_box min-w-[75px] w-[75px] relative">
-                <div className='p-5 px-3 min-w-fit w-fit flex flex-col bg-[#101010] border-r border-[#ddd] border-opacity-20 justify-between h-full'>
-                    <div className="flex flex-col">
-                        <div className="h-[50px] w-fit ">
-                            <Link href={"/"} className="text-[28px] w-[50px] h-[50px] cursor-pointer flex items-center justify-center hover:bg-[#232323] rounded-lg">
-                                <Image src={"/images/sonu_profile.jpeg"} width={40} height={40} alt='logo' className='rounded-lg object-cover w-[40px] h-[40px]' />
-                            </Link>
-                        </div>
-                        <div className="flex flex-col gap-2 py-3">
-                            {
-                                mainOptions.map((opt, index) => {
-                                    return (
-                                        <Link href={`${opt.icon !== "search" ? opt.icon !== "home" ? opt.icon === "profile" ? "/" + user?.userName : "/" + opt.icon : "/" : "#"}`} key={index} className='flex py-3 px-2 items-center rounded-lg cursor-pointer hover:bg-[#232323] border border-[#dedede00] hover:border-[#dedede88] justify-center' onClick={
-                                            (e) => {
-                                                if (opt.icon === "search") {
-                                                    setSearchBoxEnabled(false);
-                                                    setSimpleNavbarOn(false);
-                                                }
-                                            }
-                                        }>
-                                            <div className="text-[28px] " >
-                                                {
-                                                    (opt.icon === "profile" && user?.imageUrl !== null)
-                                                        ?
-                                                        <Image src={`http://127.0.0.1:8000/uploads/profile/${user?.imageUrl}/100_100.jpg`} width={30} height={30} alt='profile' className='rounded-full object-cover w-[30px] h-[30px]' />
-                                                        : iconMap[opt.icon]}
-                                            </div>
-                                        </Link>
-                                    )
-                                })
-                            }
-                            <div className="flex py-3 px-2 items-center rounded-lg cursor-pointer hover:bg-[#232323] border border-[#dedede00] hover:border-[#dedede88] justify-center text-[28px]">
-                                <BiAddToQueue />
+            <div className="relative flex">
+                <div ref={simpleNavbarRef} className="navbar_box min-w-[75px] w-[75px]">
+                    <div className='p-5 px-3 min-w-fit w-fit flex flex-col bg-[#101010] border-r border-[#ddd] border-opacity-20 justify-between h-full'>
+                        <div className="flex flex-col">
+                            <div className="h-[50px] w-fit ">
+                                <Link href={"/"} className="text-[28px] w-[50px] h-[50px] cursor-pointer flex items-center justify-center hover:bg-[#232323] rounded-lg">
+                                    <Image src={"/images/sonu_profile.jpeg"} width={40} height={40} alt='logo' className='rounded-lg object-cover w-[40px] h-[40px]' />
+                                </Link>
                             </div>
-                            <Link href={`/${user?.userName}`} className='flex py-3 px-2 items-center rounded-lg cursor-pointer hover:bg-[#232323] border border-[#dedede00] hover:border-[#dedede88] justify-center'>
-                                <div className="text-[28px]" >
-                                    {
-                                        user?.imageUrl !== null
-                                            ?
-                                            <Image src={`http://127.0.0.1:8000/uploads/profile/${user?.imageUrl}/100_100.jpg`} width={30} height={30} alt='profile' className='rounded-full object-cover w-[30px] h-[30px]' />
-                                            : <Image src={`images/sonu_profile.jpeg`} width={30} height={30} alt='profile' className='rounded-full object-cover w-[30px] h-[30px]' />
-                                    }
+                            <div className="flex flex-col gap-2 py-3">
+                                {
+                                    mainOptions.map((opt, index) => {
+                                        return (
+                                            <Link href={`${opt.icon !== "search" ? opt.icon !== "home" ? opt.icon === "profile" ? "/" + user?.userName : "/" + opt.icon : "/" : "#"}`} key={index} className='flex py-3 px-2 items-center rounded-lg cursor-pointer hover:bg-[#232323] border border-[#dedede00] hover:border-[#dedede88] justify-center' onClick={
+                                                (e) => {
+                                                    if (opt.icon === "search") {
+                                                        setSearchBoxEnabled(false);
+                                                        setSimpleNavbarOn(false);
+                                                    }
+                                                }
+                                            }>
+                                                <div className="text-[28px] " >
+                                                    {
+                                                        (opt.icon === "profile" && user?.imageUrl !== null)
+                                                            ?
+                                                            <Image src={`http://127.0.0.1:8000/uploads/profile/${user?.imageUrl}/100_100.jpg`} width={30} height={30} alt='profile' className='rounded-full object-cover w-[30px] h-[30px]' />
+                                                            : iconMap[opt.icon]}
+                                                </div>
+                                            </Link>
+                                        )
+                                    })
+                                }
+                                <div className="flex py-3 px-2 items-center rounded-lg cursor-pointer hover:bg-[#232323] border border-[#dedede00] hover:border-[#dedede88] justify-center text-[28px]">
+                                    <BiAddToQueue />
                                 </div>
-                            </Link>
-                        </div>
-                    </div>
-                    <div className="">
-                        <div className='flex py-3 px-2 items-center rounded-lg cursor-pointer hover:bg-[#232323] border border-[#dedede00] hover:border-[#dedede88] justify-center'>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger className=''>
-                                    <div className="text-2xl w-full">
-                                        <GiHamburgerMenu />
+                                <Link href={`/${user?.userName}`} className='flex py-3 px-2 items-center rounded-lg cursor-pointer hover:bg-[#232323] border border-[#dedede00] hover:border-[#dedede88] justify-center'>
+                                    <div className="text-[28px]" >
+                                        {
+                                            user?.imageUrl !== null
+                                                ?
+                                                <Image src={`http://127.0.0.1:8000/uploads/profile/${user?.imageUrl}/100_100.jpg`} width={30} height={30} alt='profile' className='rounded-full object-cover w-[30px] h-[30px]' />
+                                                : <Image src={`images/sonu_profile.jpeg`} width={30} height={30} alt='profile' className='rounded-full object-cover w-[30px] h-[30px]' />
+                                        }
                                     </div>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent className='border-none w-[220px] p-3'>
-                                    <div className='flex gap-3 py-3 px-2 rounded-lg cursor-pointer hover:bg-[#343434]'>Settings</div>
-                                    <div className='flex gap-3 py-3 px-2 rounded-lg cursor-pointer hover:bg-[#343434]' >Log Out</div>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                                </Link>
+                            </div>
+                        </div>
+                        <div className="">
+                            <div className='flex py-3 px-2 items-center rounded-lg cursor-pointer hover:bg-[#232323] border border-[#dedede00] hover:border-[#dedede88] justify-center'>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger className=''>
+                                        <div className="text-2xl w-full">
+                                            <GiHamburgerMenu />
+                                        </div>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent className='border-none w-[220px] p-3'>
+                                        <div className='flex gap-3 py-3 px-2 rounded-lg cursor-pointer hover:bg-[#343434]'>Settings</div>
+                                        <div className='flex gap-3 py-3 px-2 rounded-lg cursor-pointer hover:bg-[#343434]' >Log Out</div>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
                         </div>
                     </div>
                 </div>
                 {
                     serachBoxEnabled &&
-                    <SearchView />
+                    <div className='absolute top-0 left-[76px] z-10' ref={searchViewRef}>
+                        <SearchView />
+                    </div>
+                }
+                {
+                    serachBoxEnabled &&
+                    <div className="min-w-[175px] w-[175px] h-[100dvh]">&nbsp;</div>
                 }
             </div>
         </>
