@@ -3,9 +3,11 @@ import Image from 'next/image';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import ImageCanvas from "@/components/custom/mediaupload/ImageCanvas";
 import ImageCanvasUploader from '@/components/custom/mediaupload/ImageCanvasUploader';
-import axios from 'axios';
 import { useUserState } from '@/context/userContext';
 import { handlePostUpload } from '@/utils/apiCallHalder';
+import { DEFAULT_OPTIONS } from '@/data/filtersList';
+import ImageEditorTools from './ImageEditorTools';
+import VideoCanvasEditing from './VideoCanvasEditing';
 
 interface DefaultOption {
     name: string;
@@ -19,6 +21,7 @@ interface DefaultOption {
     defaultValue: number;
 }
 
+
 interface Property {
     scale: number;
     type: string;
@@ -30,97 +33,6 @@ interface ArrayOfUrlObjects {
     url: string;
     type: string;
 }
-
-const DEFAULT_OPTIONS: DefaultOption[] = [
-    {
-        name: "Brightness",
-        property: "brightness",
-        value: 100,
-        range: {
-            min: 0,
-            max: 200
-        },
-        unit: "%",
-        defaultValue: 100
-    },
-    {
-        name: "Contrast",
-        property: "contrast",
-        value: 100,
-        defaultValue: 100,
-        range: {
-            min: 0,
-            max: 200
-        },
-        unit: "%"
-    },
-    {
-        name: "Saturation",
-        property: "saturate",
-        value: 100,
-        defaultValue: 100,
-        range: {
-            min: 0,
-            max: 200
-        },
-        unit: "%"
-    },
-    {
-        name: "Grayscale",
-        property: "grayscale",
-        value: 0,
-        defaultValue: 0,
-        range: {
-            min: 0,
-            max: 100
-        },
-        unit: "%"
-    },
-    {
-        name: "Sepia",
-        property: "sepia",
-        value: 0,
-        defaultValue: 0,
-        range: {
-            min: 0,
-            max: 100
-        },
-        unit: "%"
-    },
-    {
-        name: "Hue Rotate",
-        property: "hue-rotate",
-        value: 0,
-        defaultValue: 0,
-        range: {
-            min: 0,
-            max: 360
-        },
-        unit: "deg"
-    },
-    {
-        name: "Blur",
-        property: "blur",
-        value: 0,
-        defaultValue: 0,
-        range: {
-            min: 0,
-            max: 20
-        },
-        unit: "px"
-    },
-    {
-        name: "Vignette",
-        property: "vignette",
-        value: 0,
-        defaultValue: 0,
-        range: {
-            min: 0,
-            max: 100
-        },
-        unit: "px"
-    }
-]
 
 interface ImageUploaderProps {
     setUploadBoxEnabled: React.Dispatch<React.SetStateAction<boolean>>;
@@ -138,7 +50,6 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadBoxEnabled }) =>
     const [currentFilters, setCurrentFilters] = useState("");
     const [editingTool, setEditingTool] = useState(false);
     const [uploadingTool, setUploadingTool] = useState(false);
-    const [filtersEditOptionsOpen, setFilterEditOptionsOpen] = useState(true);
     const [files, setFiles] = useState<FileList | null>(null);
     const [currentIdx, setCurrentIdx] = useState(0);
     const [propertList, setPropertList] = useState<Property[]>([]);
@@ -229,23 +140,6 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadBoxEnabled }) =>
         return "";
     };
 
-    const handleDefaultPropertyChanger = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setPropertList((prev) => {
-            return prev.map((property, idx) => {
-                if (idx === currentIdx) {
-                    return {
-                        ...property,
-                        DEFAULT_OPTIONS: property.DEFAULT_OPTIONS.map(opt =>
-                            opt.property === name ? { ...opt, value: Number(value) } : opt
-                        )
-                    };
-                }
-                return property;
-            });
-        })
-    };
-
     useEffect(() => {
         if (files?.length) {
             const reader = new FileReader();
@@ -255,23 +149,6 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadBoxEnabled }) =>
             reader.readAsDataURL(files[currentIdx]);
         }
     }, [currentIdx, canvasImageSrc, files]);
-
-    const handleValueReset = (index: number) => {
-        setPropertList((prev) => {
-            return prev.map((property, idx) => {
-                if (idx === currentIdx) {
-                    return {
-                        ...property,
-                        DEFAULT_OPTIONS: property.DEFAULT_OPTIONS.map((opt, optIdx) =>
-                            optIdx === index ? { ...opt, value: opt.defaultValue } : opt
-                        )
-                    };
-                }
-                return property;
-            });
-        });
-    };
-
 
     useEffect(() => {
         const currentFilterOfImage = () => {
@@ -407,17 +284,28 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadBoxEnabled }) =>
                         && <>
                             <div className={`h-[72dvh] w-full relative`}>
                                 <div className="h-[72dvh] w-[580px] overflow-hidden rounded-b-xl">
-                                    <div className={`h-[72dvh] w-[580px] object-contain rounded-b-xl overflow-hidden zoomImage`}
-                                        style={{
-                                            backgroundImage: getBackgroundImage(),
-                                            transform: `scale(${currentZoomValue})`,
-                                            backgroundPosition: "center",
-                                            backgroundSize: "cover",
-                                            height: "72dvh",
-                                            width: "580px",
-                                            filter: currentFilters
-                                        }}>
-                                    </div>
+                                    {
+                                        propertList[currentIdx].type === "IMAGE" &&
+                                        <div className={`h-[72dvh] w-[580px] object-contain rounded-b-xl overflow-hidden zoomImage`}
+                                            style={{
+                                                backgroundImage: getBackgroundImage(),
+                                                transform: `scale(${currentZoomValue})`,
+                                                backgroundPosition: "center",
+                                                backgroundSize: "cover",
+                                                height: "72dvh",
+                                                width: "580px",
+                                                filter: currentFilters
+                                            }}>
+                                        </div>
+                                    }
+                                    {
+                                        propertList[currentIdx].type === "VIDEO" &&
+                                        <div className={`h-[72dvh] w-[580px] aspect-w-9 aspect-h-16 object-contain rounded-b-xl overflow-hidden zoomImage`}>
+                                            <video autoPlay loop className="object-contain w-full h-full">
+                                                <source src={URL.createObjectURL(files[currentIdx])} />
+                                            </video>
+                                        </div>
+                                    }
                                 </div>
                                 <div className="absolute bottom-0 w-full flex justify-between items-center p-3">
                                     <div className="flex items-center gap-5">
@@ -531,77 +419,34 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadBoxEnabled }) =>
                             <>
                                 <div className="w-[90dvw] max-w-[950px] h-[72dvh] flex rounded-b-xl">
 
-                                    {/* canvas */}
-                                    <ImageCanvas imageSrc={canvasImageSrc} currentIdx={currentIdx} propertList={propertList} files={files} setCurrentIdx={setCurrentIdx} />
+                                    {
+                                        propertList[currentIdx].type === "IMAGE" &&
+                                        <>
+                                            <ImageCanvas
+                                                imageSrc={canvasImageSrc}
+                                                currentIdx={currentIdx}
+                                                propertList={propertList}
+                                                files={files}
+                                                setCurrentIdx={setCurrentIdx} />
 
-                                    <div className="w-full border-l border-[#454545] rounded-br-xl overflow-y-scroll">
-                                        <div className="grid grid-cols-2 border-b border-[#454545]">
-                                            <button
-                                                className={
-                                                    `font-semibold border-b ${filtersEditOptionsOpen ? "text-[#dedede] border-[#dedede]" : "text-[#dedede77] border-transparent"} text-[#dedede77] py-2`
-                                                }
-                                                onClick={() => { setFilterEditOptionsOpen(true) }}
-                                            >Filters</button>
-                                            <button
-                                                className={
-                                                    `font-semibold border-b ${!filtersEditOptionsOpen ? "text-[#dedede] border-[#dedede]" : "text-[#dedede77] border-transparent"} text-[#dedede77] py-2`
-                                                }
-                                                onClick={() => { setFilterEditOptionsOpen(false) }}
-                                            >Adjustments</button>
-                                        </div>
-                                        {
-                                            filtersEditOptionsOpen && (
-                                                <div>
-                                                    <div className="grid grid-cols-3 gap-3 p-3">
-                                                        {
-                                                            Array.from({ length: 11 }).map((o, index) => {
-                                                                return (
-                                                                    <div key={index} className='flex flex-col gap-1 cursor-pointer'>
-                                                                        <div className="">
-                                                                            <Image src={"/images/sonu_profile.jpeg"} alt='filter_image' width={100} height={100} className='w-full h-full object-cover rounded-xl' />
-                                                                        </div>
-                                                                        <div className="flex justify-center text-sm">Style Name</div>
-                                                                    </div>
-                                                                )
-                                                            })
-                                                        }
-                                                    </div>
-                                                    <div className="px-5 py-3">
-                                                        <input type="range" name="" id="" min={0} max={100} value={100} className='w-full' readOnly />
-                                                    </div>
-                                                </div>
-                                            )
-                                        }
-                                        {
-                                            !filtersEditOptionsOpen && (
-                                                <>
-                                                    <div className="px-5 py-3">
-                                                        {
-                                                            DEFAULT_OPTIONS.map((opt, index) => {
-                                                                return (
-                                                                    <div className="py-3 flex flex-col gap-2" key={index}>
-                                                                        <div className="flex justify-between">
-                                                                            <div className="font-semibold text-[#dedede]">{opt.name}</div>
-                                                                            <div className="">
-                                                                                {
-                                                                                    propertList[currentIdx].DEFAULT_OPTIONS[index].value !== opt.defaultValue &&
-                                                                                    <button className='text-[#0095f6]' onClick={() => { handleValueReset(index) }}>Reset</button>
-                                                                                }
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="flex gap-3">
-                                                                            <input type="range" name={opt.property} id="" max={opt.range.max} min={opt.range.min} value={propertList[currentIdx].DEFAULT_OPTIONS[index].value} className='w-full cursor-pointer' onChange={handleDefaultPropertyChanger} />
-                                                                            <div className="w-[36px] flex justify-center">{propertList[currentIdx].DEFAULT_OPTIONS[index].value}</div>
-                                                                        </div>
-                                                                    </div>
-                                                                )
-                                                            })
-                                                        }
-                                                    </div>
-                                                </>
-                                            )
-                                        }
-                                    </div>
+                                            <ImageEditorTools
+                                                currentIdx={currentIdx}
+                                                propertList={propertList}
+                                                setPropertList={setPropertList}
+                                            />
+                                        </>
+                                    }
+                                    {
+                                        propertList[currentIdx].type === "VIDEO" &&
+                                        <>
+                                            <VideoCanvasEditing
+                                                currentIdx={currentIdx}
+                                                files={files}
+                                                setCurrentIdx={setCurrentIdx}
+                                            />
+                                        </>
+                                    }
+
                                 </div>
                             </>
                         )
@@ -615,7 +460,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadBoxEnabled }) =>
                                     <div className="px-5 rounded-br-xl border-l border-[#454545]">
                                         <div className="flex py-3 gap-2 items-center">
                                             <Image src={user ? `http://127.0.0.1:8000/uploads/profile/${user?.imageUrl}/300_300.jpg` : "/images/sonu_profile.jpeg"} alt='profile_icon' width={100} height={100} className='w-[30px] h-[30px] object-cover rounded-full' />
-                                            <div className="text-sm font-semibold">{user ? user.userName:"userName"}</div>
+                                            <div className="text-sm font-semibold">{user ? user.userName : "userName"}</div>
                                         </div>
                                         <textarea value={postDescription} onChange={
                                             (e) => {
