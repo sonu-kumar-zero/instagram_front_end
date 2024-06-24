@@ -14,6 +14,7 @@ const VideoCanvasEditing: React.FC<VideoCanvasEditingProps> = (
     files, currentIdx, setCurrentIdx
   }
 ) => {
+
   const currentVideoRef = useRef<HTMLVideoElement>(null);
   const [isVideoPlaying, setIsVideoPlaying] = useState<boolean>(false);
   const [thumbnailSrc, setThumbnailSrc] = useState<string>("");
@@ -21,26 +22,50 @@ const VideoCanvasEditing: React.FC<VideoCanvasEditingProps> = (
   useEffect(() => {
     if (!currentVideoRef.current)
       return;
-    isVideoPlaying ? currentVideoRef.current.play() : currentVideoRef.current.pause();
+    if (isVideoPlaying) {
+      currentVideoRef.current.play().catch(error => {
+        console.error("Error attempting to play video:", error);
+      });
+    } else {
+      currentVideoRef.current.pause();
+    }
   }, [isVideoPlaying]);
+
+  useEffect(() => {
+    if (!currentVideoRef.current || !files || files.length === 0) return;
+
+    const url = URL.createObjectURL(files[currentIdx]);
+    currentVideoRef.current.src = url;
+
+    return () => {
+      URL.revokeObjectURL(url);
+    };
+  }, [currentIdx, files]);
 
   return (
     <>
       <div className="relative">
         <div className="h-[72dvh] w-[580px] aspect-w-9 aspect-h-16 object-contain rounded-bl-xl" >
           {
-            files && (
-              isVideoPlaying
-                ? <video className='w-full h-full object-contain' ref={currentVideoRef} onClick={() => {
-                  setIsVideoPlaying(false);
-                }}>
-                  <source src={URL.createObjectURL(files[currentIdx])} />
-                </video>
-                :
-                thumbnailSrc !== "" &&
-                <Image className="w-full h-full object-contain rounded-bl-xl" alt='thumbnail' src={thumbnailSrc} width={1080} height={1920} onClick={() => {
-                  setIsVideoPlaying(true);
-                }} />
+            files && files.length > 0 && (
+              <video
+                className={`w-full h-full object-contain ${isVideoPlaying ? '' : 'hidden'}`}
+                loop
+                ref={currentVideoRef}
+                onClick={() => setIsVideoPlaying(false)}
+              />
+            )
+          }
+          {
+            files && files.length > 0 && !isVideoPlaying && thumbnailSrc !== "" && (
+              <Image
+                className="w-full h-full object-contain rounded-bl-xl cursor-pointer"
+                alt='thumbnail'
+                src={thumbnailSrc}
+                width={1080}
+                height={1920}
+                onClick={() => setIsVideoPlaying(true)}
+              />
             )
           }
         </div>

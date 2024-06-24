@@ -1,25 +1,9 @@
 "use client";
-import { DEFAULT_OPTIONS } from '@/data/filtersList';
+import { DEFAULT_OPTIONS, preBuiltFilters } from '@/data/filtersList';
+import { DefaultOption, Property } from '@/types/uploadTypes';
 import Image from 'next/image';
 import React, { useState } from 'react'
 
-interface DefaultOption {
-    name: string;
-    property: string;
-    value: number;
-    range: {
-        min: number;
-        max: number;
-    };
-    unit: string;
-    defaultValue: number;
-}
-
-interface Property {
-    scale: number;
-    type: string;
-    DEFAULT_OPTIONS: DefaultOption[];
-}
 
 interface ImageEditorToolsProps {
     propertList: Property[];
@@ -27,10 +11,8 @@ interface ImageEditorToolsProps {
     setPropertList: React.Dispatch<React.SetStateAction<Property[]>>;
 }
 
-const ImageEditorTools: React.FC<ImageEditorToolsProps> = ({  propertList, currentIdx, setPropertList }) => {
-
+const ImageEditorTools: React.FC<ImageEditorToolsProps> = ({ propertList, currentIdx, setPropertList }) => {
     const [filtersEditOptionsOpen, setFilterEditOptionsOpen] = useState(true);
-
 
     const handleValueReset = (index: number) => {
         setPropertList((prev) => {
@@ -65,6 +47,22 @@ const ImageEditorTools: React.FC<ImageEditorToolsProps> = ({  propertList, curre
         })
     };
 
+    const applyPreBuiltFilterToCurrentImage = (newProperties: DefaultOption[]) => {
+        setPropertList((prev) => {
+            return prev.map((property, idx) => {
+                if (idx === currentIdx) {
+                    return {
+                        ...property,
+                        DEFAULT_OPTIONS: newProperties
+                    };
+                }
+                return property;
+            });
+        })
+    };
+
+
+
     return (
         <>
             <div className="w-full border-l border-[#454545] rounded-br-xl overflow-y-scroll">
@@ -87,21 +85,23 @@ const ImageEditorTools: React.FC<ImageEditorToolsProps> = ({  propertList, curre
                         <div>
                             <div className="grid grid-cols-3 gap-3 p-3">
                                 {
-                                    Array.from({ length: 11 }).map((o, index) => {
+                                    preBuiltFilters.map((preBuiltFilter, index) => {
                                         return (
-                                            <div key={index} className='flex flex-col gap-1 cursor-pointer'>
+                                            <div key={index} className='flex flex-col gap-1 cursor-pointer' onClick={() => {
+                                                applyPreBuiltFilterToCurrentImage(preBuiltFilter.properties);
+                                            }}>
                                                 <div className="">
                                                     <Image src={"/images/sonu_profile.jpeg"} alt='filter_image' width={100} height={100} className='w-full h-full object-cover rounded-xl' />
                                                 </div>
-                                                <div className="flex justify-center text-sm">Style Name</div>
+                                                <div className="flex justify-center text-center text-sm">{preBuiltFilter.name}</div>
                                             </div>
                                         )
                                     })
                                 }
                             </div>
-                            <div className="px-5 py-3">
+                            {/* <div className="px-5 py-3">
                                 <input type="range" name="" id="" min={0} max={100} value={100} className='w-full' readOnly />
-                            </div>
+                            </div> */}
                         </div>
                     )
                 }

@@ -1,47 +1,55 @@
 "use client";
-import Image from 'next/image';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import ImageCanvas from "@/components/custom/mediaupload/ImageCanvas";
 import ImageCanvasUploader from '@/components/custom/mediaupload/ImageCanvasUploader';
-import { useUserState } from '@/context/userContext';
-import { handlePostUpload } from '@/utils/apiCallHalder';
 import { DEFAULT_OPTIONS } from '@/data/filtersList';
-import ImageEditorTools from './ImageEditorTools';
-import VideoCanvasEditing from './VideoCanvasEditing';
-
-interface DefaultOption {
-    name: string;
-    property: string;
-    value: number;
-    range: {
-        min: number;
-        max: number;
-    };
-    unit: string;
-    defaultValue: number;
-}
-
-
-interface Property {
-    scale: number;
-    type: string;
-    DEFAULT_OPTIONS: DefaultOption[];
-}
-
-interface ArrayOfUrlObjects {
-    idx: number;
-    url: string;
-    type: string;
-}
+import ImageEditorTools from '@/components/custom/mediaupload/ImageEditorTools';
+import VideoCanvasEditing from '@/components/custom/mediaupload/VideoCanvasEditing';
+import { Property } from '@/types/uploadTypes';
+import PostUploaderTools from '@/components/custom/mediaupload/PostUploaderTools';
 
 interface ImageUploaderProps {
     setUploadBoxEnabled: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+interface VideoViewProps {
+    files: FileList | null;
+    currentIdx: number;
+};
+
+const VideoView: React.FC<VideoViewProps> = ({ currentIdx, files }) => {
+    const videoRef = useRef<HTMLVideoElement>(null);
+    useEffect(() => {
+        if (!videoRef.current || !files)
+            return;
+        const url = URL.createObjectURL(files[currentIdx]);
+        videoRef.current.src = url;
+        videoRef.current.onloadedmetadata = async () => {
+            const video = videoRef.current;
+            if (!video) return;
+            await videoRef.current.play();
+        }
+        return () => {
+            URL.revokeObjectURL(url);
+        }
+    }, [currentIdx, videoRef, files]);
+
+
+    return (
+        <>
+            {
+                files &&
+                <div className={`h-[72dvh] w-[580px] aspect-w-9 aspect-h-16 object-contain rounded-b-xl overflow-hidden zoomImage`}>
+                    <video ref={videoRef} loop className="object-contain w-full h-full">
+                    </video>
+                </div>
+            }
+        </>
+    )
 }
 
 const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadBoxEnabled }) => {
     const inputRef = useRef(null);
-    const userState = useUserState();
-    const user = userState ? userState.user : null;
     const [canvasImageSrc, setCanvasImageSrc] = useState<string | ArrayBuffer | null | undefined>(null);
     const [mediaSelected, setMediaSelected] = useState(false);
     const [draggingStart, setDraggingStart] = useState(false);
@@ -53,7 +61,6 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadBoxEnabled }) =>
     const [files, setFiles] = useState<FileList | null>(null);
     const [currentIdx, setCurrentIdx] = useState(0);
     const [propertList, setPropertList] = useState<Property[]>([]);
-    const [postDescription, setPostDescription] = useState("");
 
     const handleImageSelection = () => {
         const current = inputRef.current as HTMLInputElement | null;
@@ -300,11 +307,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadBoxEnabled }) =>
                                     }
                                     {
                                         propertList[currentIdx].type === "VIDEO" &&
-                                        <div className={`h-[72dvh] w-[580px] aspect-w-9 aspect-h-16 object-contain rounded-b-xl overflow-hidden zoomImage`}>
-                                            <video autoPlay loop className="object-contain w-full h-full">
-                                                <source src={URL.createObjectURL(files[currentIdx])} />
-                                            </video>
-                                        </div>
+                                        <VideoView currentIdx={currentIdx} files={files} />
                                     }
                                 </div>
                                 <div className="absolute bottom-0 w-full flex justify-between items-center p-3">
@@ -455,51 +458,9 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadBoxEnabled }) =>
                         uploadingTool && (
                             <>
                                 <div className="w-[90dvw] max-w-[950px] h-[72dvh] flex rounded-b-xl">
-                                    <ImageCanvasUploader currentIdx={currentIdx} files={files} setCurrentIdx={setCurrentIdx} imageSrc={canvasImageSrc} propertList={propertList} postDescription={postDescription} />
+                                    <ImageCanvasUploader currentIdx={currentIdx} files={files} setCurrentIdx={setCurrentIdx} imageSrc={canvasImageSrc} propertList={propertList} />
 
-                                    <div className="px-5 rounded-br-xl border-l border-[#454545]">
-                                        <div className="flex py-3 gap-2 items-center">
-                                            <Image src={user ? `http://127.0.0.1:8000/uploads/profile/${user?.imageUrl}/300_300.jpg` : "/images/sonu_profile.jpeg"} alt='profile_icon' width={100} height={100} className='w-[30px] h-[30px] object-cover rounded-full' />
-                                            <div className="text-sm font-semibold">{user ? user.userName : "userName"}</div>
-                                        </div>
-                                        <textarea value={postDescription} onChange={
-                                            (e) => {
-                                                setPostDescription(e.target.value);
-                                            }
-                                        } rows={6} placeholder={"Write a caption..."} className='outline-none bg-transparent w-full resize-none' />
-                                        <div className="text-lg font-semibold py-2">Advanced Settings</div>
-                                        <div className="flex gap-3 pb-1 items-center justify-between">
-                                            <div className="font-medium">
-                                                Hide like and view Counts on this post
-                                            </div>
-                                            <div className="">
-                                                <label className="switch">
-                                                    <input type="checkbox" />
-                                                    <span className="slider round"></span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div className="text-xs text-[#676767] ">
-                                            Only you will see the total number of likes and views on this post. You can change this later by going to ... menu at the top of post. To hide like counts on other people&apos;s posts,go to your account settings.
-                                        </div>
-                                        <div className="flex gap-3 pt-3 pb-1 items-center justify-between">
-                                            <div className="font-medium">
-                                                Turn off commenting
-                                            </div>
-                                            <div className="">
-                                                <label className="switch">
-                                                    <input type="checkbox" />
-                                                    <span className="slider round"></span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div className="text-xs text-[#676767]  ">
-                                            You can change this later by going to the ... menu at the top of your post.
-                                        </div>
-                                        <div className="flex justify-end py-5">
-                                            <button className='bg-[#0095f6] px-5 py-2 rounded-xl' onClick={() => { handlePostUpload({ user, files, propertList, postDescription }) }}>Upload Post</button>
-                                        </div>
-                                    </div>
+                                    <PostUploaderTools files={files} propertList={propertList} />
                                 </div>
                             </>
                         )

@@ -1,24 +1,6 @@
 "use client";
-
+import { Property } from '@/types/uploadTypes';
 import React, { useEffect, useRef } from 'react';
-
-
-interface DefaultOption {
-    name: string;
-    property: string;
-    value: number;
-    range: {
-        min: number;
-        max: number;
-    };
-    unit: string;
-    defaultValue: number;
-}
-
-interface Property {
-    scale: number;
-    DEFAULT_OPTIONS: DefaultOption[];
-}
 
 interface ImageCanvasUploaderProps {
     files: FileList | null;
@@ -26,12 +8,9 @@ interface ImageCanvasUploaderProps {
     setCurrentIdx: React.Dispatch<React.SetStateAction<number>>;
     imageSrc: string | ArrayBuffer | null | undefined;
     propertList: Property[];
-    postDescription: string
 };
 
-
-
-const ImageCanvasUploader: React.FC<ImageCanvasUploaderProps> = ({ imageSrc, propertList, files, currentIdx, setCurrentIdx, postDescription }) => {
+const ImageCanvasUploader: React.FC<ImageCanvasUploaderProps> = ({ imageSrc, propertList, files, currentIdx, setCurrentIdx }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {

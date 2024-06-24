@@ -1,23 +1,6 @@
 "use client";
+import { Property } from '@/types/uploadTypes';
 import React, { useRef, useEffect } from 'react';
-
-
-interface DefaultOption {
-    name: string;
-    property: string;
-    value: number;
-    range: {
-        min: number;
-        max: number;
-    };
-    unit: string;
-    defaultValue: number;
-}
-
-interface Property {
-    scale: number;
-    DEFAULT_OPTIONS: DefaultOption[];
-}
 
 interface ImageCanvasProps {
     imageSrc: string | ArrayBuffer | null | undefined;

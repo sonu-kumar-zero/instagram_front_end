@@ -3,45 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import PostsGridChild from '../explore/PostsGridChild'
 import { useUserState } from '@/context/userContext';
 import axios from 'axios';
-
-interface PostUrl {
-    id: string;
-    postId: string;
-    url: string;
-    index: number;
-    type: string;
-    createdAt: string;
-    updatedAt: string;
-}
-
-interface User {
-    userName: string;
-    name: string | null;
-    imageUrl: string | null;
-    postsCount: number;
-    followerCount: number;
-    followingCount: number;
-    bio: string | null;
-    id: string;
-    profileType: string;
-}
-
-interface Post {
-    id: string;
-    userId: string;
-    description: string;
-    likesCount: number;
-    commentCount: number;
-    viewsCount: number;
-    postUrlCount: number;
-    typeOfPost: string;
-    isCommentEnable: boolean;
-    isLikeVisible: boolean;
-    createdAt: string;
-    updatedAt: string;
-    postUrls: PostUrl[];
-    user: User;
-}
+import { PostType, UserType } from '@/types/modelsTypes';
 
 interface PicturePageProps {
     userName?: string
@@ -49,9 +11,9 @@ interface PicturePageProps {
 
 const PicturePage: React.FC<PicturePageProps> = ({ userName }) => {
     const userStates = useUserState();
-    const realUser: User | null = userStates ? userStates.user : null;
-    const currentUser: User | null = userStates ? userStates.currentUser : null;
-    const [userPosts, setUserPosts] = useState<Post[]>([]);
+    const realUser: UserType | null = userStates ? userStates.user : null;
+    const currentUser: UserType | null = userStates ? userStates.currentUser : null;
+    const [userPosts, setUserPosts] = useState<PostType[]>([]);
 
     const fetchUserPosts = useCallback(async () => {
         try {

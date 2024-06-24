@@ -7,20 +7,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { RxCross2 } from 'react-icons/rx';
 import Link from "next/link";
 import FollowerBar from './FollowerBar';
-
-
-interface FollowerUserType {
-    id: string,
-    followerId: string,
-    followingId: string,
-    isAccepted: boolean,
-    follower: {
-        imageUrl: string | null,
-        name: string | null,
-        userName: string
-    }
-}
-
+import { FollowerUserType } from '@/types/modelsTypes';
 
 const FollowersPage = () => {
     const [allFollowers, setAllFollowers] = useState<FollowerUserType[]>([]);

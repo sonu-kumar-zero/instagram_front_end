@@ -5,33 +5,10 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { RxCross2 } from 'react-icons/rx'
 import FollowerBar from './FollowerBar';
 import axios from 'axios';
-import { getAllFollowingOfUserByUserId } from '@/constants/queries';
-
-
-interface FollowerBarProps {
-    userName: string,
-    name: string | null,
-    followRequestId: string,
-    userId: string,
-    followerId: string,
-    isAccepted: boolean,
-    imageUrl: string | null
-};
-
-interface FollowerUserType {
-    id: string,
-    followerId: string,
-    followingId: string,
-    following: {
-        imageUrl: string | null,
-        name: string | null,
-        userName: string
-    }
-}
-
+import { FollowingUserType } from '@/types/modelsTypes';
 
 const FollowingPage = () => {
-    const [allFollowings, setAllFollowings] = useState<FollowerUserType[]>([]);
+    const [allFollowings, setAllFollowings] = useState<FollowingUserType[]>([]);
     const userStates = useUserState();
     const user = userStates ? userStates.user : null;
     const currentUser = userStates ? userStates.currentUser : null;

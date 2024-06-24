@@ -3,24 +3,7 @@ import React, { useState } from 'react';
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { useUserState } from '@/context/userContext';
-
-enum ProfileType {
-    PUBLIC,
-    PRIVATE
-}
-
-interface UserProps {
-    id: string;
-    userName: string;
-    bio: string | null;
-    email: string;
-    followerCount: number;
-    followingCount: number;
-    imageUrl: string | null;
-    name: string | null;
-    postsCount: number;
-    profileType: ProfileType
-}
+import { UserType } from '@/types/modelsTypes';
 
 interface LoginBoxProps {
 }
@@ -58,7 +41,7 @@ const LoginBox: React.FC<LoginBoxProps> = () => {
             });
             console.log(loginRespose);
             if (loginRespose.status === 200) {
-                const user: UserProps = loginRespose.data.user;
+                const user: UserType = loginRespose.data.user;
                 const token = loginRespose.data.token;
                 userStates.setUser(
                     {

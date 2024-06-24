@@ -26,25 +26,38 @@ const VideoEditorTools: React.FC<VideoEditorProps> = ({ files, currentIdx, setTh
     const trimLeftRef = useRef<HTMLDivElement>(null);
     const trimRightRef = useRef<HTMLDivElement>(null);
 
+    const [currentVideoDuration, setCurrentVideoDuration] = useState<number>(0);
+
     const handleMouseMoveTrim = (e: React.MouseEvent<HTMLDivElement>) => {
+        e.preventDefault();
         const containerRect = trimBoxCardsRef.current?.getBoundingClientRect();
         if (!containerRect)
             return;
         const newPosition = e.clientX - containerRect.left;
         if (newPosition >= 0 && newPosition <= 292) {
-            if (leftTrimCardDragging && leftTrimPosition < rightTrimPosition) {
-                setLeftTrimPosition(newPosition);
-            } else if (rightTrimCardDragging && leftTrimPosition < rightTrimPosition) {
-                setRIghtTrimPosition(newPosition);
+            if (leftTrimCardDragging) {
+                setLeftTrimPosition((prev) => {
+                    if (leftTrimPosition > newPosition || leftTrimPosition < rightTrimPosition)
+                        return newPosition
+                    return prev;
+                });
+            } else if (rightTrimCardDragging) {
+                setRIghtTrimPosition((prev) => {
+                    if (rightTrimPosition < newPosition || leftTrimPosition < rightTrimPosition)
+                        return newPosition
+                    return prev;
+                });
             }
         }
     }
 
     const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+        e.preventDefault();
         setVideoCardDragging(true);
     };
 
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        e.preventDefault();
         if (!videoCardDragging) return;
         const containerRect = fiveCardsBoxRef?.current?.getBoundingClientRect();
         if (containerRect) {
@@ -73,6 +86,8 @@ const VideoEditorTools: React.FC<VideoEditorProps> = ({ files, currentIdx, setTh
 
         const video = videoRef.current;
         const canvas = canvasRef.current;
+        canvas.width = 1080;
+        canvas.height = 1920;
         const context = canvas.getContext("2d");
         if (!context)
             return;
@@ -96,7 +111,8 @@ const VideoEditorTools: React.FC<VideoEditorProps> = ({ files, currentIdx, setTh
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
             setThumbnailSrc(canvas.toDataURL('image/png'));
-
+        };
+        return () => {
             URL.revokeObjectURL(url);
         }
     }, [files, currentIdx, currentCardVideoTime, setThumbnailSrc, frames]);
@@ -106,6 +122,8 @@ const VideoEditorTools: React.FC<VideoEditorProps> = ({ files, currentIdx, setTh
 
         const video = videoRef.current;
         const canvas = canvasRef.current;
+        canvas.width = 1080;
+        canvas.height = 1920;
         const context = canvas.getContext('2d');
 
         if (!context) return;
@@ -143,8 +161,10 @@ const VideoEditorTools: React.FC<VideoEditorProps> = ({ files, currentIdx, setTh
             frameImages.push(canvas.toDataURL('image/png'));
             console.log({ frameImages });
             setFrames(frameImages);
-            URL.revokeObjectURL(url);
         };
+        return () => {
+            URL.revokeObjectURL(url);
+        }
     }, [files, currentIdx]);
 
     useEffect(() => {
@@ -176,6 +196,12 @@ const VideoEditorTools: React.FC<VideoEditorProps> = ({ files, currentIdx, setTh
             return;
         const url = URL.createObjectURL(files[currentIdx]);
         cardVideoRef.current.src = url;
+        cardVideoRef.current.onloadedmetadata = async () => {
+            const video = cardVideoRef.current;
+            if (!video)
+                return;
+            setCurrentVideoDuration(video.duration);
+        }
         return () => {
             URL.revokeObjectURL(url);
         }
@@ -211,17 +237,17 @@ const VideoEditorTools: React.FC<VideoEditorProps> = ({ files, currentIdx, setTh
                                         <Image
                                             width={1080}
                                             height={1920}
-                                            className={`w-[60px] h-[84px] ${index === 0 ? "rounded-l-md" : ""} ${index === 4 ? "rounded-r-md" : ""}`}
+                                            className={`w-[60px] h-[96px] ${index === 0 ? "rounded-l-md" : ""} ${index === 4 ? "rounded-r-md" : ""}`}
                                             src={frame}
                                             alt={`Frame ${index}`} />
                                     </div>
                                 ))
                             }
                             {
-                                frames.length === 0 && <div className="h-[84px]">&nbsp;</div>
+                                frames.length === 0 && <div className="h-[96px]">&nbsp;</div>
                             }
                         </div>
-                        <div className="absolute top-0 left-0 z-10 w-[60px] h-[84px] border border-[#fff] rounded-md shadow cursor-grab"
+                        <div className="absolute top-0 left-0 z-10 w-[60px] h-[96px] border border-[#fff] rounded-md shadow cursor-grab"
                             style={{
                                 left: `${xPostionOfVideo}px`,
                                 transition: "ease-in-out"
@@ -253,14 +279,14 @@ const VideoEditorTools: React.FC<VideoEditorProps> = ({ files, currentIdx, setTh
                                         <Image
                                             width={1080}
                                             height={1920}
-                                            className={`w-[60px] h-[84px] ${index === 0 ? "rounded-l-md" : ""} ${index === 4 ? "rounded-r-md" : ""}`}
+                                            className={`w-[60px] h-[72px] ${index === 0 ? "rounded-l-md" : ""} ${index === 4 ? "rounded-r-md" : ""}`}
                                             src={frame}
                                             alt={`Frame ${index}`} />
                                     </div>
-                                )) : <div className='h-[84px]'>&nbsp;</div>}
+                                )) : <div className='h-[72px]'>&nbsp;</div>}
                         </div>
                         <div
-                            className="absolute top-0 left-0 z-10 w-[0px] h-[84px] 
+                            className="absolute top-0 left-0 z-10 w-[0px] h-[72px] 
                             bg-[#232323aa] rounded-l-md shadow"
                             style={{
                                 width: `${leftTrimPosition}px`,
@@ -272,42 +298,46 @@ const VideoEditorTools: React.FC<VideoEditorProps> = ({ files, currentIdx, setTh
                         </div>
                         <div
                             ref={trimLeftRef}
-                            className="absolute top-0 left-0 z-10 w-[8px] h-[84px] 
-                            border border-[#dedede] bg-[#232323] rounded-l-xl shadow cursor-row-resize"
+                            className="absolute top-0 left-0 z-10 w-[8px] h-[72px] 
+                            bg-[#dedede] rounded-l-xl shadow cursor-ew-resize 
+                            flex items-center justify-center"
                             style={{
                                 left: `${leftTrimPosition}px`,
                                 transition: "ease-in-out"
                             }}
                             onMouseDown={
-                                () => {
+                                (e) => {
+                                    e.preventDefault();
                                     setLeftTrimCardDragging(true);
                                     setRightTrimCardDragging(false);
                                 }
                             }
                             onMouseMove={handleMouseMoveTrim}
                         >
-                            &nbsp;
+                            <div className="h-[36px] rounded-sm w-[2px] bg-[#232323]">&nbsp;</div>
                         </div>
                         <div
                             ref={trimRightRef}
-                            className="absolute top-0 right-0 z-10 w-[8px] h-[84px] 
-                            border border-[#dedede] bg-[#232323] rounded-r-xl shadow cursor-row-resize"
+                            className="absolute top-0 right-0 z-10 w-[8px] h-[72px] 
+                            bg-[#dedede] rounded-r-xl shadow cursor-ew-resize 
+                            flex items-center justify-center"
                             style={{
                                 left: `${rightTrimPosition}px`,
                                 transition: "ease-in-out"
                             }}
                             onMouseDown={
-                                () => {
+                                (e) => {
+                                    e.preventDefault();
                                     setRightTrimCardDragging(true);
                                     setLeftTrimCardDragging(false);
                                 }
                             }
                             onMouseMove={handleMouseMoveTrim}
                         >
-                            &nbsp;
+                            <div className="h-[36px] rounded-sm w-[2px] bg-[#232323]">&nbsp;</div>
                         </div>
                         <div
-                            className="absolute top-0 right-0 z-10 w-[0px] h-[84px] 
+                            className="absolute top-0 right-0 z-10 w-[0px] h-[72px] 
                              bg-[#232323aa] rounded-r-md shadow"
                             style={{
                                 width: `${292 - rightTrimPosition}px`,
@@ -319,6 +349,29 @@ const VideoEditorTools: React.FC<VideoEditorProps> = ({ files, currentIdx, setTh
                         </div>
                     </div>
                 }
+            </div>
+
+            <div className="pt-3 flex justify-center">
+                <div className="flex justify-between w-[300px]">
+                    <div className="flex flex-col gap-3 items-center">
+                        <div className="w-[6px] h-[6px] rounded-full bg-[#efefef]">&nbsp;</div>
+                        <div className="text-[#898989] text-sm">0s</div>
+                    </div>
+                    <div className="w-[6px] h-[6px] rounded-full bg-[#898989]">&nbsp;</div>
+                    <div className="w-[6px] h-[6px] rounded-full bg-[#898989]">&nbsp;</div>
+                    <div className="w-[6px] h-[6px] rounded-full bg-[#898989]">&nbsp;</div>
+                    <div className="flex flex-col gap-3 items-center">
+                        <div className="w-[6px] h-[6px] rounded-full bg-[#efefef]">&nbsp;</div>
+                        <div className="text-[#898989] text-sm">{Math.floor(currentVideoDuration) / 2}s</div>
+                    </div>
+                    <div className="w-[6px] h-[6px] rounded-full bg-[#898989]">&nbsp;</div>
+                    <div className="w-[6px] h-[6px] rounded-full bg-[#898989]">&nbsp;</div>
+                    <div className="w-[6px] h-[6px] rounded-full bg-[#898989]">&nbsp;</div>
+                    <div className="flex flex-col gap-3 items-center">
+                        <div className="w-[6px] h-[6px] rounded-full bg-[#efefef]">&nbsp;</div>
+                        <div className="text-[#898989] text-sm">{Math.floor(currentVideoDuration)}s</div>
+                    </div>
+                </div>
             </div>
 
             <div className="pt-7 flex justify-between items-center">
