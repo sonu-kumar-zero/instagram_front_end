@@ -30,4 +30,19 @@ const timeDifference = (diffMs: number): string => {
   }
 };
 
-export { timeDifference };
+const secondToTimeStringConversion = (sec: number): string => {
+  const sPerMinute: number = 60;
+  let ans = "";
+  if (sec < sPerMinute) {
+    ans = "00:" + `${sec < 10 ? "0" + sec : sec}`;
+  } else {
+    const min = Math.floor(sec / sPerMinute);
+    const seconds = sec % sPerMinute;
+    ans = `${min < 10 ? "0" + min : min}:${
+      seconds < 10 ? "0" + seconds : seconds
+    }`;
+  }
+  return ans;
+};
+
+export { timeDifference, secondToTimeStringConversion };

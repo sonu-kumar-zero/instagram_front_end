@@ -2,40 +2,156 @@
 import React, { useEffect, useRef, useState } from 'react'
 import VideoEditorTools from './VideoEditorTools'
 import Image from 'next/image';
+import { Property } from '@/types/uploadTypes';
 
 interface VideoCanvasEditingProps {
   files: FileList | null;
   currentIdx: number;
   setCurrentIdx: React.Dispatch<React.SetStateAction<number>>;
+  setPropertList: React.Dispatch<React.SetStateAction<Property[]>>;
+  propertList: Property[]
 }
+
 
 const VideoCanvasEditing: React.FC<VideoCanvasEditingProps> = (
   {
-    files, currentIdx, setCurrentIdx
+    files, currentIdx, setCurrentIdx, setPropertList, propertList
   }
 ) => {
-
   const currentVideoRef = useRef<HTMLVideoElement>(null);
   const [isVideoPlaying, setIsVideoPlaying] = useState<boolean>(false);
   const [thumbnailSrc, setThumbnailSrc] = useState<string>("");
+  const [videoStartingTime, setVideoStartingTime] = useState<number>(0);
+  const [videoEndingTime, setVideoEndingTime] = useState<number>(0);
+  const [videoCardCursorPosition, setVideoCardCursorPosition] = useState<number>(0);
+  const [leftTrimSeconds, setLeftTrimSeconds] = useState<number>(0);
+  const [rightTrimSeconds, setRightTrimSeconds] = useState<number>(0);
+  const [leftTrimPosition, setLeftTrimPosition] = useState<number>(0);
+  const [isVideoMuted, setIsVideoMuted] = useState<boolean>(false);
+
+  useEffect(() => {
+    const video = currentVideoRef.current;
+    if (!video) {
+      return;
+    };
+    video.onloadedmetadata = async () => {
+      setRightTrimSeconds(Math.floor(video.duration));
+    }
+  }, []);
+
+  useEffect(() => {
+    setPropertList((prev) => {
+      return prev.map((property, idx) => {
+        if (idx === currentIdx) {
+          return {
+            ...property,
+            VIDEO_DEFAULT_OPTIONS: {
+              ...prev[idx].VIDEO_DEFAULT_OPTIONS, videoMuted: isVideoMuted
+            }
+          };
+        }
+        return property;
+      });
+    })
+  }, [currentIdx, isVideoMuted, setPropertList]);
+
+  useEffect(() => {
+    setPropertList((prev) => {
+      return prev.map((property, idx) => {
+        if (idx === currentIdx) {
+          return {
+            ...property,
+            VIDEO_DEFAULT_OPTIONS: {
+              ...prev[idx].VIDEO_DEFAULT_OPTIONS, endTime: rightTrimSeconds
+            }
+          };
+        }
+        return property;
+      });
+    })
+  }, [currentIdx, rightTrimSeconds, setPropertList]);
+
+  useEffect(() => {
+    setPropertList((prev) => {
+      return prev.map((property, idx) => {
+        if (idx === currentIdx) {
+          return {
+            ...property,
+            VIDEO_DEFAULT_OPTIONS: {
+              ...prev[idx].VIDEO_DEFAULT_OPTIONS, startTime: leftTrimSeconds
+            }
+          };
+        }
+        return property;
+      });
+    })
+  }, [currentIdx, leftTrimSeconds, setPropertList]);
+
+  useEffect(() => {
+    setPropertList((prev) => {
+      return prev.map((property, idx) => {
+        if (idx === currentIdx) {
+          return {
+            ...property,
+            VIDEO_DEFAULT_OPTIONS: {
+              ...prev[idx].VIDEO_DEFAULT_OPTIONS, imageUrl: thumbnailSrc
+            }
+          };
+        }
+        return property;
+      });
+    })
+  }, [currentIdx, thumbnailSrc, setPropertList]);
 
   useEffect(() => {
     if (!currentVideoRef.current)
       return;
     if (isVideoPlaying) {
+      currentVideoRef.current.currentTime = videoStartingTime;
       currentVideoRef.current.play().catch(error => {
         console.error("Error attempting to play video:", error);
       });
     } else {
       currentVideoRef.current.pause();
     }
-  }, [isVideoPlaying]);
+  }, [isVideoPlaying, videoStartingTime]);
+
+  useEffect(() => {
+    const video = currentVideoRef.current;
+    if (!video)
+      return;
+    video.muted = isVideoMuted;
+  }, [isVideoMuted]);
+
+  useEffect(() => {
+    const video = currentVideoRef.current;
+    if (!video) return;
+
+    const handleTimeUpdate = () => {
+      const curPos = (Math.floor(video.currentTime) / video.duration) * 291;
+      setVideoCardCursorPosition(curPos);
+      if (Math.floor(video.currentTime) === videoEndingTime) {
+        video.currentTime = videoStartingTime;
+        setIsVideoPlaying(false);
+      }
+    };
+
+    video.addEventListener('timeupdate', handleTimeUpdate);
+
+    return () => {
+      video.removeEventListener('timeupdate', handleTimeUpdate);
+    };
+  }, [videoEndingTime, videoStartingTime, setIsVideoPlaying, leftTrimSeconds, leftTrimPosition]);
 
   useEffect(() => {
     if (!currentVideoRef.current || !files || files.length === 0) return;
 
     const url = URL.createObjectURL(files[currentIdx]);
     currentVideoRef.current.src = url;
+    const video = currentVideoRef.current;
+    video.onloadedmetadata = async () => {
+      setVideoEndingTime(video.duration);
+    }
 
     return () => {
       URL.revokeObjectURL(url);
@@ -45,11 +161,11 @@ const VideoCanvasEditing: React.FC<VideoCanvasEditingProps> = (
   return (
     <>
       <div className="relative">
-        <div className="h-[72dvh] w-[580px] aspect-w-9 aspect-h-16 object-contain rounded-bl-xl" >
+        <div className="h-[72dvh] w-[580px] aspect-w-9 aspect-h-16 object-cover rounded-bl-xl" >
           {
             files && files.length > 0 && (
               <video
-                className={`w-full h-full object-contain ${isVideoPlaying ? '' : 'hidden'}`}
+                className={`w-full h-full object-cover rounded-bl-xl ${isVideoPlaying ? '' : 'hidden'}`}
                 loop
                 ref={currentVideoRef}
                 onClick={() => setIsVideoPlaying(false)}
@@ -59,7 +175,7 @@ const VideoCanvasEditing: React.FC<VideoCanvasEditingProps> = (
           {
             files && files.length > 0 && !isVideoPlaying && thumbnailSrc !== "" && (
               <Image
-                className="w-full h-full object-contain rounded-bl-xl cursor-pointer"
+                className="w-full h-full object-cover rounded-bl-xl cursor-pointer"
                 alt='thumbnail'
                 src={thumbnailSrc}
                 width={1080}
@@ -100,7 +216,26 @@ const VideoCanvasEditing: React.FC<VideoCanvasEditingProps> = (
           </div>
         }
       </div>
-      <VideoEditorTools files={files} currentIdx={currentIdx} setThumbnailSrc={setThumbnailSrc} />
+      <VideoEditorTools
+        files={files}
+        currentIdx={currentIdx}
+        isVideoPlaying={isVideoPlaying}
+        setThumbnailSrc={setThumbnailSrc}
+        setIsVideoPlaying={setIsVideoPlaying}
+        setVideoStartingTime={setVideoStartingTime}
+        setVideoEndingTime={setVideoEndingTime}
+        videoCardCursorPosition={videoCardCursorPosition}
+        setVideoCardCursorPosition={setVideoCardCursorPosition}
+        leftTrimSeconds={leftTrimSeconds}
+        setLeftTrimSeconds={setLeftTrimSeconds}
+        rightTrimSeconds={rightTrimSeconds}
+        setRightTrimSeconds={setRightTrimSeconds}
+        leftTrimPosition={leftTrimPosition}
+        setLeftTrimPosition={setLeftTrimPosition}
+        setIsVideoMuted={setIsVideoMuted}
+        isVideoMuted={isVideoMuted}
+        propertyList={propertList}
+      />
     </>
   )
 }

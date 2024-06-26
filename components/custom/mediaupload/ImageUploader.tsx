@@ -7,6 +7,7 @@ import ImageEditorTools from '@/components/custom/mediaupload/ImageEditorTools';
 import VideoCanvasEditing from '@/components/custom/mediaupload/VideoCanvasEditing';
 import { Property } from '@/types/uploadTypes';
 import PostUploaderTools from '@/components/custom/mediaupload/PostUploaderTools';
+import VideoCanvasUploader from './VideoCanvasUploader';
 
 interface ImageUploaderProps {
     setUploadBoxEnabled: React.Dispatch<React.SetStateAction<boolean>>;
@@ -75,7 +76,6 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadBoxEnabled }) =>
         setDraggingStart(true);
     };
 
-
     const handleOnDrag = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         setDraggingStart(true);
@@ -94,17 +94,28 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadBoxEnabled }) =>
     function getMediaType(mediaType: string): string {
         if (mediaType.startsWith('video/'))
             return 'VIDEO';
-        else
+        else if (mediaType.startsWith('image/'))
             return 'IMAGE';
+        else
+            return "";
     }
 
     const initializePropertyList = useCallback((fileList: FileList) => {
-        const newList = Array.from(fileList).map((file) => ({
-            scale: 1,
-            type: getMediaType(file.type),
-            DEFAULT_OPTIONS: DEFAULT_OPTIONS
-        }));
-        console.log(newList);
+        const newList = Array.from(fileList).map((file) => {
+            const mediaType = getMediaType(file.type);
+            const VIDEO_DEFAULT_OPTIONS = {
+                imageUrl: null,
+                videoMuted: false,
+                startTime: 0,
+                endTime: 0
+            }
+            return {
+                scale: 1,
+                type: mediaType,
+                DEFAULT_OPTIONS: DEFAULT_OPTIONS,
+                VIDEO_DEFAULT_OPTIONS: VIDEO_DEFAULT_OPTIONS
+            }
+        });
         setPropertList(newList);
     }, []);
 
@@ -446,6 +457,8 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadBoxEnabled }) =>
                                                 currentIdx={currentIdx}
                                                 files={files}
                                                 setCurrentIdx={setCurrentIdx}
+                                                propertList={propertList}
+                                                setPropertList={setPropertList}
                                             />
                                         </>
                                     }
@@ -458,7 +471,14 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadBoxEnabled }) =>
                         uploadingTool && (
                             <>
                                 <div className="w-[90dvw] max-w-[950px] h-[72dvh] flex rounded-b-xl">
-                                    <ImageCanvasUploader currentIdx={currentIdx} files={files} setCurrentIdx={setCurrentIdx} imageSrc={canvasImageSrc} propertList={propertList} />
+                                    {
+                                        propertList[currentIdx].type === "IMAGE" &&
+                                        <ImageCanvasUploader currentIdx={currentIdx} files={files} setCurrentIdx={setCurrentIdx} imageSrc={canvasImageSrc} propertList={propertList} />
+                                    }
+                                    {
+                                        propertList[currentIdx].type === "VIDEO" &&
+                                        <VideoCanvasUploader currentIdx={currentIdx} files={files} propertList={propertList} setCurrentIdx={setCurrentIdx} />
+                                    }
 
                                     <PostUploaderTools files={files} propertList={propertList} />
                                 </div>

@@ -1,14 +1,31 @@
 "use client";
+import { Property } from '@/types/uploadTypes';
+import { secondToTimeStringConversion } from '@/utils/dataManipulator';
 import Image from 'next/image';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 interface VideoEditorProps {
     files: FileList | null;
     currentIdx: number;
-    setThumbnailSrc: React.Dispatch<React.SetStateAction<string>>
+    setThumbnailSrc: React.Dispatch<React.SetStateAction<string>>;
+    setIsVideoPlaying: React.Dispatch<React.SetStateAction<boolean>>;
+    setVideoStartingTime: React.Dispatch<React.SetStateAction<number>>;
+    setVideoEndingTime: React.Dispatch<React.SetStateAction<number>>;
+    setVideoCardCursorPosition: React.Dispatch<React.SetStateAction<number>>;
+    videoCardCursorPosition: number;
+    isVideoPlaying: boolean;
+    leftTrimSeconds: number;
+    setLeftTrimSeconds: React.Dispatch<React.SetStateAction<number>>
+    rightTrimSeconds: number;
+    setRightTrimSeconds: React.Dispatch<React.SetStateAction<number>>;
+    setLeftTrimPosition: React.Dispatch<React.SetStateAction<number>>;
+    leftTrimPosition: number;
+    isVideoMuted: boolean;
+    setIsVideoMuted: React.Dispatch<React.SetStateAction<boolean>>;
+    propertyList: Property[]
 }
 
-const VideoEditorTools: React.FC<VideoEditorProps> = ({ files, currentIdx, setThumbnailSrc }) => {
+const VideoEditorTools: React.FC<VideoEditorProps> = ({ files, currentIdx, setThumbnailSrc, setIsVideoPlaying, setVideoEndingTime, setVideoStartingTime, videoCardCursorPosition, setVideoCardCursorPosition, isVideoPlaying, leftTrimSeconds, rightTrimSeconds, setLeftTrimSeconds, setRightTrimSeconds, leftTrimPosition, setLeftTrimPosition, isVideoMuted, setIsVideoMuted, propertyList }) => {
     const videoRef = useRef<HTMLVideoElement | null>(null);
     const cardVideoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -20,13 +37,16 @@ const VideoEditorTools: React.FC<VideoEditorProps> = ({ files, currentIdx, setTh
 
     const [leftTrimCardDragging, setLeftTrimCardDragging] = useState(false);
     const [rightTrimCardDragging, setRightTrimCardDragging] = useState(false);
-    const [leftTrimPosition, setLeftTrimPosition] = useState<number>(0);
+
     const [rightTrimPosition, setRIghtTrimPosition] = useState<number>(292);
     const trimBoxCardsRef = useRef<HTMLDivElement>(null);
     const trimLeftRef = useRef<HTMLDivElement>(null);
     const trimRightRef = useRef<HTMLDivElement>(null);
 
     const [currentVideoDuration, setCurrentVideoDuration] = useState<number>(0);
+    const [leftTrimTime, setLeftTrimTime] = useState<string>("00:00");
+    const [rightTrimTime, setRightTrimTime] = useState<string>("00:00");
+
 
     const handleMouseMoveTrim = (e: React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
@@ -168,6 +188,43 @@ const VideoEditorTools: React.FC<VideoEditorProps> = ({ files, currentIdx, setTh
     }, [files, currentIdx]);
 
     useEffect(() => {
+        setVideoCardCursorPosition(leftTrimPosition);
+        setIsVideoPlaying(true);
+    }, [leftTrimPosition, setIsVideoPlaying, setVideoCardCursorPosition]);
+
+    useEffect(() => {
+        setIsVideoPlaying(true);
+    }, [rightTrimPosition, setIsVideoPlaying]);
+
+    useEffect(() => {
+        const time = Math.floor((leftTrimPosition / 291) * currentVideoDuration);
+        setLeftTrimSeconds(time);
+    }, [leftTrimPosition, currentVideoDuration, setLeftTrimSeconds]);
+
+    useEffect(() => {
+        const stringTime = secondToTimeStringConversion(leftTrimSeconds);
+        setLeftTrimTime(stringTime);
+    }, [leftTrimSeconds]);
+
+    useEffect(() => {
+        setVideoStartingTime(leftTrimSeconds);
+    }, [leftTrimSeconds, setVideoStartingTime]);
+
+    useEffect(() => {
+        const time = Math.floor((rightTrimPosition / 291) * currentVideoDuration);
+        setRightTrimSeconds(time);
+    }, [rightTrimPosition, currentVideoDuration, setRightTrimSeconds]);
+
+    useEffect(() => {
+        const stringTime = secondToTimeStringConversion(rightTrimSeconds);
+        setRightTrimTime(stringTime);
+    }, [rightTrimSeconds]);
+
+    useEffect(() => {
+        setVideoEndingTime(rightTrimSeconds);
+    }, [rightTrimSeconds, setVideoEndingTime]);
+
+    useEffect(() => {
         if (cardVideoRef.current && currentCardVideoTime)
             cardVideoRef.current.currentTime = currentCardVideoTime;
     }, [currentCardVideoTime]);
@@ -296,6 +353,14 @@ const VideoEditorTools: React.FC<VideoEditorProps> = ({ files, currentIdx, setTh
                         >
                             &nbsp;
                         </div>
+                        {
+                            leftTrimCardDragging &&
+                            <div className="absolute -top-5 left-0 z-10 text-sm text-[#dedede] ease-in-out" style={{
+                                left: `${leftTrimPosition}px`
+                            }}>
+                                {leftTrimTime}
+                            </div>
+                        }
                         <div
                             ref={trimLeftRef}
                             className="absolute top-0 left-0 z-10 w-[8px] h-[72px] 
@@ -336,6 +401,14 @@ const VideoEditorTools: React.FC<VideoEditorProps> = ({ files, currentIdx, setTh
                         >
                             <div className="h-[36px] rounded-sm w-[2px] bg-[#232323]">&nbsp;</div>
                         </div>
+                        {
+                            rightTrimCardDragging &&
+                            <div className="absolute -top-5 right-0 z-10 text-sm text-[#dedede] ease-in-out" style={{
+                                left: `${rightTrimPosition}px`
+                            }}>
+                                {rightTrimTime}
+                            </div>
+                        }
                         <div
                             className="absolute top-0 right-0 z-10 w-[0px] h-[72px] 
                              bg-[#232323aa] rounded-r-md shadow"
@@ -347,6 +420,16 @@ const VideoEditorTools: React.FC<VideoEditorProps> = ({ files, currentIdx, setTh
                         >
                             &nbsp;
                         </div>
+                        {
+                            isVideoPlaying &&
+                            <div className="absolute w-[4px] h-[80px] -top-1 rounded-xl bg-[#fff]"
+                                style={{
+                                    left: `${videoCardCursorPosition}px`
+                                }}
+                            >
+                                &nbsp;
+                            </div>
+                        }
                     </div>
                 }
             </div>
@@ -375,16 +458,19 @@ const VideoEditorTools: React.FC<VideoEditorProps> = ({ files, currentIdx, setTh
             </div>
 
             <div className="pt-7 flex justify-between items-center">
-                <div className="">Sound On</div>
+                <div className="">Sound Off</div>
                 <div className="">
                     <label className="switch">
-                        <input type="checkbox" checked={true} />
+                        <input type="checkbox" checked={isVideoMuted} onChange={
+                            (e) => {
+                                setIsVideoMuted(e.target.checked);
+                            }} />
                         <span className="slider round"></span>
                     </label>
                 </div>
             </div>
 
-        </div>
+        </div >
     );
 };
 
