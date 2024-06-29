@@ -105,12 +105,9 @@ const PostDisplayer: React.FC<PostDisplayerProps> = ({ setPostDisplayerOn, post 
         }
     }, [post, user]);
 
-
     useEffect(() => {
-        if (!post)
-            return;
         fetchAllCommentsOfGivenPostId();
-    }, [post, fetchAllCommentsOfGivenPostId]);
+    }, [fetchAllCommentsOfGivenPostId]);
 
     useEffect(() => {
         fetchStatusOfLike();
