@@ -19,13 +19,12 @@ import ImageDisplayer from './ImageDisplayer';
 
 
 interface PostDisplayerProps {
-    url: string,
     setPostDisplayerOn: React.Dispatch<React.SetStateAction<boolean>>,
     post?: PostType
 };
 
 
-const PostDisplayer: React.FC<PostDisplayerProps> = ({ url, setPostDisplayerOn, post }) => {
+const PostDisplayer: React.FC<PostDisplayerProps> = ({ setPostDisplayerOn, post }) => {
     const userStates = useUserState();
     const user: UserType | null = userStates ? userStates.user : null;
     const [currentIdx, setCurrentIdx] = useState<number>(0);
@@ -170,7 +169,7 @@ const PostDisplayer: React.FC<PostDisplayerProps> = ({ url, setPostDisplayerOn, 
                     <div className="max-w-[700px] h-full relative">
                         <div ref={postContainerRef} className={` ${(post && post.postUrls[currentIdx].type === "VIDEO") ? "max-w-[450px]" : "max-w-[700px]"} h-full flex overflow-x-hidden snap-mandatory snap-x remove_scroll_bar`}>
                             {
-                                post ? post.postUrls.map(
+                                post && post.postUrls.map(
                                     (posturl, index) => {
                                         if (posturl.type === "IMAGE")
                                             return (
@@ -182,8 +181,6 @@ const PostDisplayer: React.FC<PostDisplayerProps> = ({ url, setPostDisplayerOn, 
                                             )
                                     }
                                 )
-                                    :
-                                    <Image src={url} width={1080} height={1080} alt="post" className="w-[700px] h-full object-cover" />
                             }
                         </div>
                         {

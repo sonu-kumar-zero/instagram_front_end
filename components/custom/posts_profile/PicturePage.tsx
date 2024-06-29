@@ -60,7 +60,7 @@ const PicturePage: React.FC<PicturePageProps> = ({ userName }) => {
                 {
                     userPosts.map((post) => {
                         return (
-                            <PostsGridChild key={post.id} url={"/images/high/1.jpg"} height={"h-[300px]"} post={post} />
+                            <PostsGridChild key={post.id} height={"h-[300px]"} post={post} />
                         )
                     })
                 }

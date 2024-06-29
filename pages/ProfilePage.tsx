@@ -12,7 +12,7 @@ import axios from "axios";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 
 interface ProfilePageProps {
-    userName: string | null
+    userName: string;
 }
 
 const ProfilePage: React.FC<ProfilePageProps> = ({ userName }) => {
@@ -33,6 +33,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userName }) => {
     });
 
     const fetchdataOfCurrentUser = useCallback(async () => {
+        if (!userName)
+            return;
         const searchUserFromUserName = await axios.get(
             `http://localhost:4000/api/user/data/${userName}`
         );
@@ -82,7 +84,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userName }) => {
 
 
     useEffect(() => {
-        if (userName === realUser.userName)
+        if (userName && userName === realUser.userName)
             return;
         checkIsFollowAccepted();
 

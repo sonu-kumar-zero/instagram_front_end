@@ -7,13 +7,12 @@ import ImageDisplayer from '../common/ImageDisplayer';
 
 
 interface PostsGridChildProps {
-    url: string,
     big?: boolean,
     height?: string,
-    post?: PostType
+    post: PostType
 };
 
-const PostsGridChild: React.FC<PostsGridChildProps> = ({ url, big, post, height = "h-full" }) => {
+const PostsGridChild: React.FC<PostsGridChildProps> = ({ big, post, height = "h-full" }) => {
     const [overLayShow, SetOverLayShow] = useState<boolean>(false);
     const [postDisplayerOn, setPostDisplayerOn] = useState<boolean>(false);
 
@@ -28,13 +27,13 @@ const PostsGridChild: React.FC<PostsGridChildProps> = ({ url, big, post, height 
             >
                 {
                     post && post.typeOfPost === "IMAGE" &&
-                    <Image src={post ? `http://127.0.0.1:8000/uploads/posts/${post.postUrls[0].url}/1080_1080.jpg` : url} alt='post' width={500} height={500} className={
+                    <Image src={`http://127.0.0.1:8000/uploads/posts/${post.postUrls[0].url}/1080_1080.jpg`} alt='post' width={500} height={500} className={
                         `object-cover w-full h-full`
                     } />
                 }
                 {
                     post && post.typeOfPost === "VIDEO" &&
-                    <Image src={post ? `http://127.0.0.1:8000/uploads/thumbnails/${post.postUrls[0].url}/1080_1920.jpg` : url} alt='post' width={1080} height={1920} className={
+                    <Image src={`http://127.0.0.1:8000/uploads/thumbnails/${post.postUrls[0].url}/1080_1920.jpg`} alt='post' width={1080} height={1920} className={
                         `object-cover w-full h-full`
                     } />
                 }
@@ -105,7 +104,7 @@ const PostsGridChild: React.FC<PostsGridChildProps> = ({ url, big, post, height 
             </div>
             {
                 postDisplayerOn &&
-                <PostDisplayer post={post} url={url} setPostDisplayerOn={setPostDisplayerOn} />
+                <PostDisplayer post={post} setPostDisplayerOn={setPostDisplayerOn} />
             }
         </>
     )

@@ -30,10 +30,10 @@ const Page = () => {
         <button className="text-[#0095f6]">+ New Collection</button>
       </div>
       <div className="grid grid-cols-3 gap-3 py-3">
-          <SavedCard url={"/images/high/1.jpg"} collectionName='All Posts'/>
-          <SavedCard url={"/images/high/5.jpg"} collectionName='N9'/>
-          <SavedCard url={"/images/high/2.jpg"} collectionName='Required'/>
-          <SavedCard url={"/images/high/10.jpg"} collectionName='Start'/>
+        <SavedCard url={"/images/high/1.jpg"} collectionName='All Posts' />
+        <SavedCard url={"/images/high/5.jpg"} collectionName='N9' />
+        <SavedCard url={"/images/high/2.jpg"} collectionName='Required' />
+        <SavedCard url={"/images/high/10.jpg"} collectionName='Start' />
       </div>
     </div>
   )
