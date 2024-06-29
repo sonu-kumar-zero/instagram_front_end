@@ -11,7 +11,7 @@ export interface DefaultOption {
 }
 
 export interface VideoDefaultOption {
-  imageUrl: string | null;
+  imageUrl: string;
   videoMuted: boolean;
   startTime: number;
   endTime: number;

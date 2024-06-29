@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Property } from '@/types/uploadTypes';
 
 interface VideoCanvasEditingProps {
-  files: FileList | null;
+  files: File[];
   currentIdx: number;
   setCurrentIdx: React.Dispatch<React.SetStateAction<number>>;
   setPropertList: React.Dispatch<React.SetStateAction<Property[]>>;
@@ -163,7 +163,7 @@ const VideoCanvasEditing: React.FC<VideoCanvasEditingProps> = (
       <div className="relative">
         <div className="h-[72dvh] w-[580px] aspect-w-9 aspect-h-16 object-cover rounded-bl-xl" >
           {
-            files && files.length > 0 && (
+            files.length > 0 && (
               <video
                 className={`w-full h-full object-cover rounded-bl-xl ${isVideoPlaying ? '' : 'hidden'}`}
                 loop
@@ -173,7 +173,7 @@ const VideoCanvasEditing: React.FC<VideoCanvasEditingProps> = (
             )
           }
           {
-            files && files.length > 0 && !isVideoPlaying && thumbnailSrc !== "" && (
+            files.length > 0 && !isVideoPlaying && thumbnailSrc !== "" && (
               <Image
                 className="w-full h-full object-cover rounded-bl-xl cursor-pointer"
                 alt='thumbnail'
@@ -186,7 +186,6 @@ const VideoCanvasEditing: React.FC<VideoCanvasEditingProps> = (
           }
         </div>
         {
-          files &&
           currentIdx < files.length - 1 &&
           <div className="absolute right-3 top-1/2 -translate-y-1/2">
             <button className='bg-[#121212aa] p-3 rounded-full' onClick={

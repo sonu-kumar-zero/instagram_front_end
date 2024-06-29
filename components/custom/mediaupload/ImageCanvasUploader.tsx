@@ -3,7 +3,7 @@ import { Property } from '@/types/uploadTypes';
 import React, { useEffect, useRef } from 'react';
 
 interface ImageCanvasUploaderProps {
-    files: FileList | null;
+    files: File[];
     currentIdx: number;
     setCurrentIdx: React.Dispatch<React.SetStateAction<number>>;
     imageSrc: string | ArrayBuffer | null | undefined;
@@ -79,7 +79,7 @@ const ImageCanvasUploader: React.FC<ImageCanvasUploaderProps> = ({ imageSrc, pro
             <div className="relative">
                 <canvas ref={canvasRef} width={1080} height={1080} className='w-[580px] h-[72dvh] rounded-bl-xl' />
                 {
-                    files &&
+                    files.length > 0 &&
                     currentIdx < files.length - 1 &&
                     <div className="absolute right-3 top-1/2 -translate-y-1/2">
                         <button className='bg-[#121212aa] p-3 rounded-full' onClick={
@@ -94,7 +94,7 @@ const ImageCanvasUploader: React.FC<ImageCanvasUploaderProps> = ({ imageSrc, pro
                     </div>
                 }
                 {
-                    files &&
+                    files.length > 0 &&
                     currentIdx > 0 && currentIdx < files.length &&
                     <div className="absolute left-3 top-1/2 -translate-y-1/2">
                         <button className='bg-[#121212aa] p-3 rounded-full' onClick={

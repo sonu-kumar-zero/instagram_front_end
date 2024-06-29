@@ -8,13 +8,17 @@ import VideoCanvasEditing from '@/components/custom/mediaupload/VideoCanvasEditi
 import { Property } from '@/types/uploadTypes';
 import PostUploaderTools from '@/components/custom/mediaupload/PostUploaderTools';
 import VideoCanvasUploader from './VideoCanvasUploader';
+import ImageAddOn from './ImageAddOn';
+import ZoomInputComponent from './ZoomInputComponent';
+import FrontImageDisplayer from './FrontImageDisplayer';
+import Image from 'next/image';
 
 interface ImageUploaderProps {
     setUploadBoxEnabled: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 interface VideoViewProps {
-    files: FileList | null;
+    files: File[];
     currentIdx: number;
 };
 
@@ -39,7 +43,7 @@ const VideoView: React.FC<VideoViewProps> = ({ currentIdx, files }) => {
     return (
         <>
             {
-                files &&
+                files.length > 0 &&
                 <div className={`h-[72dvh] w-[580px] aspect-w-9 aspect-h-16 object-contain rounded-b-xl overflow-hidden zoomImage`}>
                     <video ref={videoRef} loop className="object-contain w-full h-full">
                     </video>
@@ -55,19 +59,28 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadBoxEnabled }) =>
     const [mediaSelected, setMediaSelected] = useState(false);
     const [draggingStart, setDraggingStart] = useState(false);
     const [zoomVisible, setZoomVisible] = useState(false);
-    const [currentZoomValue, setCurrentZoomValue] = useState(1);
-    const [currentFilters, setCurrentFilters] = useState("");
     const [editingTool, setEditingTool] = useState(false);
     const [uploadingTool, setUploadingTool] = useState(false);
-    const [files, setFiles] = useState<FileList | null>(null);
+    const [openImageAddON, setOpenImageAddON] = useState(false);
+    const [files, setFiles] = useState<File[]>([]);
     const [currentIdx, setCurrentIdx] = useState(0);
+    const [zoomValue, setZoomValue] = useState<number>(1);
     const [propertList, setPropertList] = useState<Property[]>([]);
+    const [isUploadingStart, setIsUploadingStart] = useState<boolean>(false);
 
     const handleImageSelection = () => {
         const current = inputRef.current as HTMLInputElement | null;
         if (current) {
             setMediaSelected(true);
-            setFiles(current.files);
+            setFiles(
+                (prev) => {
+                    if (current.files === null)
+                        return [];
+                    if (prev === null)
+                        return Array.from(current.files);
+                    return [...Array.from(prev), ...Array.from(current.files)]
+                }
+            )
         }
     };
 
@@ -81,13 +94,12 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadBoxEnabled }) =>
         setDraggingStart(true);
     }
 
-
     const handleOnDrop = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         setDraggingStart(false);
         if (e.dataTransfer.files && !editingTool && !uploadingTool) {
             setMediaSelected(true);
-            setFiles(() => e.dataTransfer.files);
+            setFiles(() => Array.from(e.dataTransfer.files));
         };
     };
 
@@ -100,66 +112,63 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadBoxEnabled }) =>
             return "";
     }
 
-    const initializePropertyList = useCallback((fileList: FileList) => {
-        const newList = Array.from(fileList).map((file) => {
+    const handleCleanUpOfAllMedia = () => {
+        setFiles([]);
+    };
+
+    const openMediaInputBox = () => {
+        const current = inputRef.current as HTMLInputElement | null;
+        current?.click();
+    }
+
+    useEffect(() => {
+        if (propertList.length > 0)
+            setZoomValue((prev) => propertList[currentIdx].scale);
+    }, [currentIdx, propertList]);
+
+    useEffect(() => {
+        if (files.length === 0) {
+            setPropertList([]);
+        }
+    }, [files]);
+
+    const initializePropertyList = useCallback((fileList: File[]) => {
+        let cleanUpFire = false;
+        fileList.map((file) => {
             const mediaType = getMediaType(file.type);
-            const VIDEO_DEFAULT_OPTIONS = {
-                imageUrl: null,
-                videoMuted: false,
-                startTime: 0,
-                endTime: 0
-            }
-            return {
-                scale: 1,
-                type: mediaType,
-                DEFAULT_OPTIONS: DEFAULT_OPTIONS,
-                VIDEO_DEFAULT_OPTIONS: VIDEO_DEFAULT_OPTIONS
+            if (mediaType === "") {
+                cleanUpFire = true;
+                handleCleanUpOfAllMedia();
             }
         });
-        setPropertList(newList);
+        if (!cleanUpFire) {
+            const newList = fileList.map((file) => {
+                const mediaType = getMediaType(file.type);
+                const VIDEO_DEFAULT_OPTIONS = {
+                    imageUrl: "",
+                    videoMuted: false,
+                    startTime: 0,
+                    endTime: 0
+                }
+                return {
+                    scale: 1,
+                    type: mediaType,
+                    DEFAULT_OPTIONS: DEFAULT_OPTIONS,
+                    VIDEO_DEFAULT_OPTIONS: VIDEO_DEFAULT_OPTIONS
+                }
+            });
+            setPropertList(newList);
+        }
     }, []);
 
     useEffect(() => {
-        if (files) {
+        if (files.length > 0) {
             initializePropertyList(files);
         }
     }, [files, initializePropertyList]);
 
-    const handleEveryThing = (e: React.MouseEvent<HTMLDivElement>) => {
-        // e.preventDefault();
-        setZoomVisible(false);
-    }
-
-    const handleZoomChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        e.stopPropagation();
-        const newScale = (Number(e.target.value) + 100) / 100;
-
-        setPropertList(prev =>
-            prev.map((item, index) =>
-                index === currentIdx ? { ...item, scale: newScale } : item
-            )
-        );
-    };
-
     useEffect(() => {
-        if (propertList.length > 0)
-            setCurrentZoomValue((prev) => (propertList[currentIdx].scale));
-    }, [currentIdx, propertList]);
-
-    const getBackgroundImage = () => {
-        if (files && files[currentIdx]) {
-            try {
-                return `url(${URL.createObjectURL(files[currentIdx])})`;
-            } catch (error) {
-                console.error("Failed to create object URL", error);
-                return "";
-            }
-        }
-        return "";
-    };
-
-    useEffect(() => {
-        if (files?.length) {
+        if (files.length > 0) {
             const reader = new FileReader();
             reader.onload = (e) => {
                 setCanvasImageSrc(e.target?.result);
@@ -168,23 +177,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadBoxEnabled }) =>
         }
     }, [currentIdx, canvasImageSrc, files]);
 
-    useEffect(() => {
-        const currentFilterOfImage = () => {
-            if (propertList.length < 0)
-                return;
-            const filters = propertList[currentIdx]?.DEFAULT_OPTIONS.map(
-                (option) => {
-                    if (option.name === "Vignette") return "";
-                    return `${option.property}(${option.value}${option.unit})`;
-                }
-            );
 
-            const filter = filters?.join(" ");
-            if (filter)
-                setCurrentFilters(filter);
-        };
-        currentFilterOfImage();
-    }, [currentIdx, files, propertList]);
 
 
     return (
@@ -193,9 +186,29 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadBoxEnabled }) =>
                 onDragOver={handleOnDragOver}
                 onDrag={handleOnDrag}
                 onDrop={handleOnDrop}
-                onClick={handleEveryThing}
                 className="absolute top-0 left-0 z-10 w-[100dvw] h-[100dvh] flex justify-center items-center bg-[#28282888]"
             >
+                <form >
+                    <label htmlFor='image_input'>
+                    </label>
+
+                    <input
+                        name='image_input'
+                        title="image_input"
+                        ref={inputRef}
+                        type='file'
+                        accept="
+                image/jpeg,
+                image/png,
+                image/heic,
+                image/heif,
+                video/mp4,
+                video/quicktime"
+                        hidden
+                        multiple
+                        onChange={handleImageSelection}
+                    />
+                </form>
                 <div
                     className={`bg-[#282828] w-[90dvw] ${editingTool || uploadingTool ? "max-w-[950px]" : "max-w-[580px]"} h-[78dvh] rounded-xl flex flex-col`}
                 >
@@ -207,7 +220,6 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadBoxEnabled }) =>
                                         <button className=""
                                             onClick={
                                                 (e) => {
-                                                    // setEditingTool(false);
                                                     if (uploadingTool) {
                                                         setUploadingTool(false);
                                                         setEditingTool(true);
@@ -274,27 +286,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadBoxEnabled }) =>
                                         }
                                     }>Select From Computer</button>
                             </div>
-                            <form >
-                                <label htmlFor='image_input'>
-                                </label>
 
-                                <input
-                                    name='image_input'
-                                    title="image_input"
-                                    ref={inputRef}
-                                    type='file'
-                                    accept="
-                            image/jpeg,
-                            image/png,
-                            image/heic,
-                            image/heif,
-                            video/mp4,
-                            video/quicktime"
-                                    hidden
-                                    multiple
-                                    onChange={handleImageSelection}
-                                />
-                            </form>
                         </div>
                     }
                     {
@@ -304,17 +296,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadBoxEnabled }) =>
                                 <div className="h-[72dvh] w-[580px] overflow-hidden rounded-b-xl">
                                     {
                                         propertList[currentIdx].type === "IMAGE" &&
-                                        <div className={`h-[72dvh] w-[580px] object-contain rounded-b-xl overflow-hidden zoomImage`}
-                                            style={{
-                                                backgroundImage: getBackgroundImage(),
-                                                transform: `scale(${currentZoomValue})`,
-                                                backgroundPosition: "center",
-                                                backgroundSize: "cover",
-                                                height: "72dvh",
-                                                width: "580px",
-                                                filter: currentFilters
-                                            }}>
-                                        </div>
+                                        <FrontImageDisplayer currentIdx={currentIdx} propertList={propertList} imageSrc={canvasImageSrc} />
                                     }
                                     {
                                         propertList[currentIdx].type === "VIDEO" &&
@@ -359,35 +341,50 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadBoxEnabled }) =>
                                             </button>
                                             {
                                                 zoomVisible &&
-                                                <div className="absolute -top-10 left-0 bg-[#121212aa] px-2 rounded-xl flex items-center py-4">
-                                                    <input type="range" id="zoom" name="zoom" min="0" max="100" step="5" className='p-0 h-1 m-0 bg-white range-input appearance-none rounded-xl focus:outline-none cursor-pointer' value={propertList[currentIdx].scale * 100 - 100}
-                                                        onChange={handleZoomChange}
+                                                <div className={`absolute -top-10 left-0`}>
+                                                    <ZoomInputComponent
+                                                        setZoomVisible={setZoomVisible}
+                                                        zoomValue={zoomValue}
+                                                        currentIdx={currentIdx}
+                                                        setPropertList={setPropertList}
                                                     />
                                                 </div>
                                             }
                                         </div>
                                     </div>
-                                    <button className="bg-[#121212aa] p-3 rounded-full">
-                                        <svg
-                                            aria-label="Open media gallery"
-                                            className=""
-                                            fill="currentColor"
-                                            height="16"
-                                            role="img"
-                                            viewBox="0 0 24 24"
-                                            width="16"
-                                        >
-                                            <title>Open media gallery</title>
-                                            <path d="M19 15V5a4.004 4.004 0 0 0-4-4H5a4.004 4.004 0 0 0-4 4v10a4.004 4.004 0 0 0 4 4h10a4.004 4.004 0 0 0 4-4ZM3 15V5a2.002 2.002 0 0 1 2-2h10a2.002 2.002 0 0 1 2 2v10a2.002 2.002 0 0 1-2 2H5a2.002 2.002 0 0 1-2-2Zm18.862-8.773A.501.501 0 0 0 21 6.57v8.431a6 6 0 0 1-6 6H6.58a.504.504 0 0 0-.35.863A3.944 3.944 0 0 0 9 23h6a8 8 0 0 0 8-8V9a3.95 3.95 0 0 0-1.138-2.773Z" fillRule="evenodd">
-                                            </path>
-                                        </svg>
-                                    </button>
+                                    <div className="relative">
+                                        <button className="bg-[#121212aa] p-3 rounded-full relative" onClick={
+                                            () => {
+                                                setOpenImageAddON(true);
+                                            }
+                                        }>
+                                            <svg
+                                                aria-label="Open media gallery"
+                                                className=""
+                                                fill="currentColor"
+                                                height="16"
+                                                role="img"
+                                                viewBox="0 0 24 24"
+                                                width="16"
+                                            >
+                                                <title>Open media gallery</title>
+                                                <path d="M19 15V5a4.004 4.004 0 0 0-4-4H5a4.004 4.004 0 0 0-4 4v10a4.004 4.004 0 0 0 4 4h10a4.004 4.004 0 0 0 4-4ZM3 15V5a2.002 2.002 0 0 1 2-2h10a2.002 2.002 0 0 1 2 2v10a2.002 2.002 0 0 1-2 2H5a2.002 2.002 0 0 1-2-2Zm18.862-8.773A.501.501 0 0 0 21 6.57v8.431a6 6 0 0 1-6 6H6.58a.504.504 0 0 0-.35.863A3.944 3.944 0 0 0 9 23h6a8 8 0 0 0 8-8V9a3.95 3.95 0 0 0-1.138-2.773Z" fillRule="evenodd">
+                                                </path>
+                                            </svg>
+                                        </button>
+                                        {
+                                            openImageAddON &&
+                                            <div className='absolute bottom-10 right-0 z-10'>
+                                                <ImageAddOn setOpenImageAddON={setOpenImageAddON} files={files} setCurrentIdx={setCurrentIdx} propertyList={propertList} setFiles={setFiles} openMediaInputBox={openMediaInputBox} />
+                                            </div>
+                                        }
+                                    </div>
                                 </div>
 
 
                                 <div className="flex gap-2 absolute bottom-6 left-1/2 -translate-x-1/2">
                                     {
-                                        Array.from({ length: files.length }).map((opt, index) => {
+                                        files.map((opt, index) => {
                                             return (
                                                 <div className={`w-[7px] h-[7px] rounded-full ${index === currentIdx ? "bg-[#0095f6]" : "bg-[#dedede77]"}`} key={index}>
                                                 </div>
@@ -480,7 +477,9 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadBoxEnabled }) =>
                                         <VideoCanvasUploader currentIdx={currentIdx} files={files} propertList={propertList} setCurrentIdx={setCurrentIdx} />
                                     }
 
-                                    <PostUploaderTools files={files} propertList={propertList} />
+                                    <PostUploaderTools files={files} propertyList={propertList} setIsUploadingStart={setIsUploadingStart}
+                                        setUploadBoxEnabled={setUploadBoxEnabled}
+                                    />
                                 </div>
                             </>
                         )
@@ -493,6 +492,14 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ setUploadBoxEnabled }) =>
                     <path d="M18.8,16l5.5-5.5c0.8-0.8,0.8-2,0-2.8l0,0C24,7.3,23.5,7,23,7c-0.5,0-1,0.2-1.4,0.6L16,13.2l-5.5-5.5  c-0.8-0.8-2.1-0.8-2.8,0C7.3,8,7,8.5,7,9.1s0.2,1,0.6,1.4l5.5,5.5l-5.5,5.5C7.3,21.9,7,22.4,7,23c0,0.5,0.2,1,0.6,1.4  C8,24.8,8.5,25,9,25c0.5,0,1-0.2,1.4-0.6l5.5-5.5l5.5,5.5c0.8,0.8,2.1,0.8,2.8,0c0.8-0.8,0.8-2.1,0-2.8L18.8,16z" />
                 </svg>
             </button>
+
+            {
+                isUploadingStart
+                &&
+                <div className="absolute top-0 left-0 z-20 flex justify-center items-center bg-[#28282811] w-[100dvw] h-[100dvh]">
+                    <Image src={"/gif/Spinner.gif"} alt='spinner' width={100} height={100} className='w-[100px] h-[100px] mix-blend-multiply bg-[#282828]' unoptimized={true} />
+                </div>
+            }
         </>
     )
 }

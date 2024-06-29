@@ -14,6 +14,8 @@ import EmojiBoard from './EmojiBoard';
 import { CommentType, PostType, UserType } from '@/types/modelsTypes';
 import UserCommentBoxBar from './UserCommentBoxBar';
 import CommentBoxBar from './CommentBoxBar';
+import M3U8Player from './M3U8Player';
+import ImageDisplayer from './ImageDisplayer';
 
 
 interface PostDisplayerProps {
@@ -164,15 +166,23 @@ const PostDisplayer: React.FC<PostDisplayerProps> = ({ url, setPostDisplayerOn, 
                     setPostDisplayerOn(false);
                 };
             }}>
-                <div className="flex w-full h-full">
-                    <div className="w-[700px] h-full relative">
-                        <div ref={postContainerRef} className="w-[700px] h-full flex overflow-x-hidden snap-mandatory snap-x remove_scroll_bar">
+                <div className="flex w-full h-full  justify-center">
+                    <div className="max-w-[700px] h-full relative">
+                        <div ref={postContainerRef} className={` ${(post && post.postUrls[currentIdx].type === "VIDEO") ? "max-w-[450px]" : "max-w-[700px]"} h-full flex overflow-x-hidden snap-mandatory snap-x remove_scroll_bar`}>
                             {
-                                post ? post.postUrls.map((posturl) => {
-                                    return (
-                                        <Image key={posturl.id} src={`http://127.0.0.1:8000/uploads/posts/${posturl.url}/1080_1080.jpg`} width={1080} height={1080} alt="post" className="w-[700px] h-full object-cover snap-center" />
-                                    )
-                                }) :
+                                post ? post.postUrls.map(
+                                    (posturl, index) => {
+                                        if (posturl.type === "IMAGE")
+                                            return (
+                                                <Image key={posturl.id} src={`http://127.0.0.1:8000/uploads/posts/${posturl.url}/1080_1080.jpg`} width={1080} height={1080} alt="post" className="w-[700px] h-full object-cover snap-center" />
+                                            )
+                                        else if (posturl.type === "VIDEO")
+                                            return (
+                                                <M3U8Player url={`http://127.0.0.1:8000/uploads/reels/${posturl.url}/index.m3u8`} key={posturl.id} index={index} currentIdx={currentIdx} />
+                                            )
+                                    }
+                                )
+                                    :
                                     <Image src={url} width={1080} height={1080} alt="post" className="w-[700px] h-full object-cover" />
                             }
                         </div>

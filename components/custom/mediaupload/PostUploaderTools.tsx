@@ -4,17 +4,22 @@ import { Property } from '@/types/uploadTypes';
 import { handlePostUpload } from '@/utils/apiCallHalder';
 import Image from 'next/image';
 import React, { useState } from 'react'
+import { GrEmoji } from 'react-icons/gr';
+import EmojiBoard from '../common/EmojiBoard';
 
 interface PostUploaderToolsProps {
-    files: FileList | null;
-    propertList: Property[];
+    files: File[];
+    propertyList: Property[];
+    setIsUploadingStart: React.Dispatch<React.SetStateAction<boolean>>;
+    setUploadBoxEnabled: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const PostUploaderTools: React.FC<PostUploaderToolsProps> = ({ files, propertList }) => {
+const PostUploaderTools: React.FC<PostUploaderToolsProps> = ({ files, propertyList, setIsUploadingStart, setUploadBoxEnabled }) => {
     const userState = useUserState();
     const user = userState ? userState.user : null;
 
     const [postDescription, setPostDescription] = useState("");
+    const [isEmojiBoardOpen, setIsEmojiBoardOpen] = useState(false);
 
     return (
         <>
@@ -27,7 +32,25 @@ const PostUploaderTools: React.FC<PostUploaderToolsProps> = ({ files, propertLis
                     (e) => {
                         setPostDescription(e.target.value);
                     }
-                } rows={6} placeholder={"Write a caption..."} className='outline-none bg-transparent w-full resize-none' />
+                } rows={6} placeholder={"Write a caption..."} className='outline-none bg-transparent w-full resize-none text-sm text-[#dedede]' />
+                <div className="py-2 relative flex justify-between text-sm text-[#676767] items-center">
+                    <>
+                        <GrEmoji className="cursor-pointer" size={28} onClick={
+                            () => {
+                                setIsEmojiBoardOpen(true);
+                            }
+                        } />
+                        {
+                            isEmojiBoardOpen &&
+                            <div className='absolute top-0 z-10'>
+                                <EmojiBoard setIsEmojiBoardOpen={setIsEmojiBoardOpen} setUserCommentString={setPostDescription} />
+                            </div>
+                        }
+                    </>
+                    <div className="text-sm text-[#676767]">
+                        {postDescription.length}/2200
+                    </div>
+                </div>
                 <div className="text-lg font-semibold py-2">Advanced Settings</div>
                 <div className="flex gap-3 pb-1 items-center justify-between">
                     <div className="font-medium">
@@ -62,7 +85,7 @@ const PostUploaderTools: React.FC<PostUploaderToolsProps> = ({ files, propertLis
                         className='bg-[#0095f6] px-5 py-2 rounded-xl'
                         onClick={
                             () => {
-                                handlePostUpload({ user, files, propertList, postDescription });
+                                handlePostUpload({ user, files, propertyList, postDescription, setIsUploadingStart, setUploadBoxEnabled });
                             }
                         }>
                         Upload Post

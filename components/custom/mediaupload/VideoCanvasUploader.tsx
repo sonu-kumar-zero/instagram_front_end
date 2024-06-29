@@ -4,7 +4,7 @@ import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react'
 
 interface VideoCanvasUploaderProps {
-    files: FileList | null;
+    files: File[];
     currentIdx: number;
     propertList: Property[];
     setCurrentIdx: React.Dispatch<React.SetStateAction<number>>;
@@ -62,7 +62,7 @@ const VideoCanvasUploader: React.FC<VideoCanvasUploaderProps> = ({ files, curren
             <div className="relative">
                 <div className="h-[72dvh] w-[580px] aspect-w-9 aspect-h-16 object-cover rounded-bl-xl" >
                     {
-                        files && files.length > 0 && (
+                        files.length > 0 && (
                             <video
                                 className={`w-full h-full object-cover rounded-bl-xl ${isVideoPlaying ? '' : 'hidden'}`}
                                 loop
@@ -72,7 +72,7 @@ const VideoCanvasUploader: React.FC<VideoCanvasUploaderProps> = ({ files, curren
                         )
                     }
                     {
-                        files && files.length > 0 && !isVideoPlaying && propertList[currentIdx].VIDEO_DEFAULT_OPTIONS.imageUrl !== null && (
+                        files.length > 0 && !isVideoPlaying && propertList[currentIdx].VIDEO_DEFAULT_OPTIONS.imageUrl !== null && (
                             <Image
                                 className="w-full h-full object-cover rounded-bl-xl cursor-pointer"
                                 alt='thumbnail'
@@ -85,7 +85,7 @@ const VideoCanvasUploader: React.FC<VideoCanvasUploaderProps> = ({ files, curren
                     }
                 </div>
                 {
-                    files &&
+                    files.length > 0 &&
                     currentIdx < files.length - 1 &&
                     <div className="absolute right-3 top-1/2 -translate-y-1/2">
                         <button className='bg-[#121212aa] p-3 rounded-full' onClick={
@@ -100,7 +100,7 @@ const VideoCanvasUploader: React.FC<VideoCanvasUploaderProps> = ({ files, curren
                     </div>
                 }
                 {
-                    files &&
+                    files.length > 0 &&
                     currentIdx > 0 && currentIdx < files.length &&
                     <div className="absolute left-3 top-1/2 -translate-y-1/2">
                         <button className='bg-[#121212aa] p-3 rounded-full' onClick={

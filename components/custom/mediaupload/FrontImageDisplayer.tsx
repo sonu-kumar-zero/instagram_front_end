@@ -1,17 +1,47 @@
 "use client";
 import { Property } from '@/types/uploadTypes';
-import React, { useRef, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react'
 
-interface ImageCanvasProps {
+interface FrontImageDisplayerProps {
     imageSrc: string | ArrayBuffer | null | undefined;
     propertList: Property[];
     currentIdx: number;
-    files: File[];
-    setCurrentIdx: React.Dispatch<React.SetStateAction<number>>
 }
 
-const Canvas: React.FC<ImageCanvasProps> = ({ imageSrc, propertList, currentIdx, files, setCurrentIdx }) => {
+const FrontImageDisplayer: React.FC<FrontImageDisplayerProps> = ({ currentIdx, propertList, imageSrc }) => {
+
     const canvasRef = useRef<HTMLCanvasElement>(null);
+
+    // const getBackgroundImage = () => {
+    //     if (files && files[currentIdx]) {
+    //         try {
+    //             return `url(${URL.createObjectURL(files[currentIdx])})`;
+    //         } catch (error) {
+    //             console.error("Failed to create object URL", error);
+    //             return "";
+    //         }
+    //     }
+    //     return "";
+    // };
+
+    // useEffect(() => {
+    //     const currentFilterOfImage = () => {
+    //         if (propertList.length < 0)
+    //             return;
+    //         const filters = propertList[currentIdx]?.DEFAULT_OPTIONS.map(
+    //             (option) => {
+    //                 if (option.name === "Vignette") return "";
+    //                 return `${option.property}(${option.value}${option.unit})`;
+    //             }
+    //         );
+
+    //         const filter = filters?.join(" ");
+    //         if (filter)
+    //             setCurrentFilters(filter);
+    //     };
+    //     currentFilterOfImage();
+    // }, [currentIdx, files, propertList]);
+
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -74,43 +104,12 @@ const Canvas: React.FC<ImageCanvasProps> = ({ imageSrc, propertList, currentIdx,
     }, [imageSrc, canvasRef, currentIdx, propertList]);
 
 
+
     return (
         <>
-            <div className="relative">
-                <canvas ref={canvasRef} width={1080} height={1080} className='w-[580px] h-[72dvh] rounded-bl-xl' />
-                {
-                    files.length > 0 &&
-                    currentIdx < files.length - 1 &&
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                        <button className='bg-[#121212aa] p-3 rounded-full' onClick={
-                            () => setCurrentIdx((prev) => {
-                                if (prev < files.length - 1) {
-                                    return prev + 1;
-                                };
-                                return prev;
-                            })}>
-                            <svg aria-label="Right chevron" className="x1lliihq x1n2onr6 x9bdzbf" fill="currentColor" height="16" role="img" viewBox="0 0 24 24" width="16"><title>Right chevron</title><polyline fill="none" points="8 3 17.004 12 8 21" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></polyline></svg>
-                        </button>
-                    </div>
-                }
-                {
-                    files.length > 0 &&
-                    currentIdx > 0 && currentIdx < files.length &&
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                        <button className='bg-[#121212aa] p-3 rounded-full' onClick={
-                            () => setCurrentIdx((prev) => {
-                                if (prev > 0) {
-                                    return prev - 1;
-                                };
-                                return prev;
-                            })}>
-                            <svg aria-label="Left chevron" className="x1lliihq x1n2onr6 x9bdzbf" fill="currentColor" height="16" role="img" viewBox="0 0 24 24" width="16"><title>Left chevron</title><polyline fill="none" points="16.502 3 7.498 12 16.502 21" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></polyline></svg>
-                        </button>
-                    </div>
-                }
-            </div>
+            <canvas ref={canvasRef} width={1080} height={1080} className='w-[580px] h-[72dvh] rounded-b-xl' />
         </>
     )
-};
+}
 
-export default Canvas;
+export default FrontImageDisplayer

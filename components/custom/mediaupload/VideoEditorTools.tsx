@@ -5,7 +5,7 @@ import Image from 'next/image';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 interface VideoEditorProps {
-    files: FileList | null;
+    files: File[];
     currentIdx: number;
     setThumbnailSrc: React.Dispatch<React.SetStateAction<string>>;
     setIsVideoPlaying: React.Dispatch<React.SetStateAction<boolean>>;
@@ -99,7 +99,7 @@ const VideoEditorTools: React.FC<VideoEditorProps> = ({ files, currentIdx, setTh
     };
 
     const extractThumbnail = useCallback(async () => {
-        if (!videoRef.current || !canvasRef.current || !files) return;
+        if (!videoRef.current || !canvasRef.current || files.length === 0) return;
 
         if (frames.length === 0)
             return;
@@ -138,7 +138,7 @@ const VideoEditorTools: React.FC<VideoEditorProps> = ({ files, currentIdx, setTh
     }, [files, currentIdx, currentCardVideoTime, setThumbnailSrc, frames]);
 
     const extractFrames = useCallback(async () => {
-        if (!videoRef.current || !canvasRef.current || !files) return;
+        if (!videoRef.current || !canvasRef.current || files.length === 0) return;
 
         const video = videoRef.current;
         const canvas = canvasRef.current;
@@ -247,7 +247,7 @@ const VideoEditorTools: React.FC<VideoEditorProps> = ({ files, currentIdx, setTh
     }, [extractFrames]);
 
     useEffect(() => {
-        if (!files)
+        if (files.length === 0)
             return;
         if (!cardVideoRef.current)
             return;
