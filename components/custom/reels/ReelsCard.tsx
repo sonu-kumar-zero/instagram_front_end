@@ -6,40 +6,90 @@ import { FiSend } from "react-icons/fi";
 import { IoEllipsisHorizontal, IoPerson } from "react-icons/io5";
 import { RiMessengerLine } from "react-icons/ri";
 import { RxSpeakerLoud, RxSpeakerOff } from "react-icons/rx";
+import { ReelType } from "@/types/modelsTypes";
+import ReactPlayer from "react-player";
 
-interface ReelsCardProps {
-    url: string,
-    audioPlaying: boolean,
-    setAudioPlaying: React.Dispatch<React.SetStateAction<boolean>>
+interface VideoFrameProps {
+    url: string;
+    videoPlaying: boolean;
+    audioPlaying: boolean;
 }
 
-const ReelsCard: React.FC<ReelsCardProps> = ({ url, audioPlaying, setAudioPlaying }) => {
+const VideoFrame: React.FC<VideoFrameProps> = ({ url, videoPlaying, audioPlaying }) => {
+    // const videoRef = useRef<HTMLVideoElement>(null);
 
-    const videoRef = useRef<HTMLVideoElement | null>(null);
-    const [videoPlaying, setVideoPlaying] = useState<boolean>(false);
+    // useEffect(() => {
+    //     const video = videoRef.current;
+    //     if (!video) return;
+    //     videoPlaying ? video.play() : video.pause();
+    // }, [videoPlaying]);
+
+    return (
+        <>
+            <div className="min-w-[50dvh] max-w-[52dvh] h-[90dvh]">
+                {
+                    // videoPlaying &&
+                    // <video
+                    //     ref={videoRef}
+                    //     width="100%"
+                    //     height="90dvh"
+                    //     preload="auto"
+                    //     className="h-[90dvh]"
+                    //     data-setup="{}"
+                    // >
+                    //     <source src={url} type="application/x-mpegURL" />
+                    // </video>
+                    <ReactPlayer
+                        url={url}
+                        playing={videoPlaying}
+                        width="100%"
+                        height="90dvh"
+                        muted={!audioPlaying}
+                        loop={true}
+                        config={{
+                            file: {
+                                attributes: {
+                                    crossOrigin: 'anonymous'
+                                }
+                            }
+                        }}
+                    />
+                }
+            </div>
+        </>
+    )
+}
+
+interface ReelsCardProps {
+    url: string;
+    audioPlaying: boolean;
+    setAudioPlaying: React.Dispatch<React.SetStateAction<boolean>>;
+    reel: ReelType;
+}
+
+const ReelsCard: React.FC<ReelsCardProps> = ({ audioPlaying, setAudioPlaying, reel }) => {
+
+    const videoRef = useRef<HTMLDivElement | null>(null);
+    const [videoPlaying, setVideoPlaying] = useState<boolean>(true);
 
     const handleVidoSwitchOnAndOff = (e: React.MouseEvent<HTMLDivElement>) => {
         const target = e.target as HTMLElement;
         if (target?.classList.contains("video_overlay_layer")) {
-            videoPlaying ? videoRef.current?.pause() : videoRef.current?.play();
+            // videoPlaying ? videoRef.current?.pause() : videoRef.current?.play();
             setVideoPlaying((prev) => !prev);
         }
     }
 
-
     useEffect(() => {
         const video = videoRef.current;
-        if (!videoRef.current) return;
-        videoRef.current.muted = true;
+        if (!video) return;
 
         const handleIntersection = (entries: IntersectionObserverEntry[]) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    videoRef?.current?.play();
-                    setVideoPlaying(true);
+                    setVideoPlaying(prev => prev !== true ? true : prev); // Only update if the state changes
                 } else {
-                    videoRef?.current?.pause();
-                    setVideoPlaying(false);
+                    setVideoPlaying(prev => prev !== false ? false : prev); // Only update if the state changes
                 }
             });
         };
@@ -49,35 +99,71 @@ const ReelsCard: React.FC<ReelsCardProps> = ({ url, audioPlaying, setAudioPlayin
             threshold: 0.5,
         });
 
-        observer.observe(videoRef.current);
+        observer.observe(video);
 
         return () => {
             observer.disconnect();
         };
-    }, [videoRef, url]);
+    }, []);
 
-    useEffect(() => {
-        if (videoRef?.current)
-            videoRef.current.muted = audioPlaying;
-    }, [videoRef, audioPlaying]);
+    // useEffect(() => {
+    //     const video = videoRef.current;
+    //     if (!video) return;
+
+    //     const handleIntersection = (entries: IntersectionObserverEntry[]) => {
+    //         entries.forEach(entry => {
+    //             if (entry.isIntersecting) {
+    //                 if (!videoPlaying) {
+    //                     setVideoPlaying(true);
+    //                 }
+    //             } else {
+    //                 setVideoPlaying(false);
+    //             }
+    //         });
+    //     };
+
+    //     const observer = new IntersectionObserver(handleIntersection, {
+    //         root: null,
+    //         threshold: 0.5,
+    //     });
+
+    //     observer.observe(video);
+
+    //     return () => {
+    //         observer.disconnect();
+    //     };
+
+    // }, [reel, videoPlaying]);
+
+    // useEffect(() => {
+    //     if (videoRef.current)
+    //         videoRef.current.muted = audioPlaying;
+    // }, [videoRef, audioPlaying]);
 
     return <>
         <div className="h-[90dvh] w-fit relative rounded-xl snap-center">
             {/* video component */}
-            <video src={url} className="w-full h-full rounded-lg brightness-90" muted ref={videoRef} loop />
+            <div className=" w-fit h-[90dvh] max-h-[90dvh] rounded-lg brightness-90" ref={videoRef}>
+                {
+                    <VideoFrame
+                        url={`http://127.0.0.1:8000/uploads/reels/${reel.url}/index.m3u8`} videoPlaying={videoPlaying}
+                        audioPlaying={audioPlaying} />
+                }
+            </div>
+            {/* <video src={url} className="" ref={videoRef} /> */}
 
             {/* thumbnail component */}
-            <Image src={"/images/high/3.jpg"} className="w-full h-full absolute top-0 left-0 blur-xl -z-10" width={200} height={200} alt="blur_post_thumbnail" />
+            <Image src={`http://127.0.0.1:8000/uploads/thumbnails/${reel.url}/1080_1920.jpg`} className="w-full h-full absolute top-0 left-0 blur-[12px] -z-10" width={1080} height={1920} alt="blur_post_thumbnail" />
 
             {/* extra feauture buttons */}
             <div className="flex flex-col gap-6 absolute bottom-0 -right-14 items-center text-xl">
                 <button className="flex flex-col items-center">
                     <FaRegHeart />
-                    <span className="text-xs">464K</span>
+                    <span className="text-xs">{reel.post.likesCount}</span>
                 </button>
                 <button className="flex flex-col items-center">
                     <RiMessengerLine />
-                    <span className="text-xs">2,377</span>
+                    <span className="text-xs">{reel.post.commentCount}</span>
                 </button>
                 <button>
                     <FiSend />
@@ -88,7 +174,7 @@ const ReelsCard: React.FC<ReelsCardProps> = ({ url, audioPlaying, setAudioPlayin
                 <button>
                     <IoEllipsisHorizontal />
                 </button>
-                <Image src={"/images/sonu_profile.jpeg"} width={30} height={30} alt="music_icon" className="w-[30px] h-[30px] rounded object-cover" />
+                <Image src={`http://127.0.0.1:8000/uploads/profile/${reel.post.user.imageUrl}/300_300.jpg`} width={30} height={30} alt="music_icon" className="w-[30px] h-[30px] rounded object-cover" />
             </div>
 
             {/* video overlay layer */}
@@ -99,7 +185,7 @@ const ReelsCard: React.FC<ReelsCardProps> = ({ url, audioPlaying, setAudioPlayin
                 <div className="w-full flex justify-end">
                     <button className="bg-[#dedede33] p-2 rounded-full hover:bg-[#dedede66]" onClick={() => setAudioPlaying(prev => !prev)}>
                         {
-                            audioPlaying ?
+                            !audioPlaying ?
                                 <RxSpeakerOff size={24} /> :
                                 <RxSpeakerLoud size={24} />
                         }
@@ -118,13 +204,13 @@ const ReelsCard: React.FC<ReelsCardProps> = ({ url, audioPlaying, setAudioPlayin
                 }
                 <div className="w-full flex flex-col gap-3 p-3">
                     <div className="flex gap-3 items-center">
-                        <Image src={"/images/sonu_profile.jpeg"} className="w-[40px] h-[40px] rounded-full" width={40} height={40} alt="user_profile_img" />
-                        <span className=" text-sm">starksonu12</span>
+                        <Image src={`http://127.0.0.1:8000/uploads/profile/${reel.post.user.imageUrl}/300_300.jpg`} className="w-[40px] h-[40px] rounded-full" width={40} height={40} alt="user_profile_img" />
+                        <span className=" text-sm">{reel.post.user.userName}</span>
                         <span>•</span>
                         <button className="border border-[#dedede] border-opacity-20 rounded-xl hover:from-pink-500 hover:to-yellow-500 px-2 hover:bg-gradient-to-r">Follow</button>
                     </div>
                     <div className="text-sm flex gap-1 w-2/3">
-                        <span className="truncate">Who knows this feeling?😊 I am sonu kumar</span>
+                        <span className="truncate">{reel.post.description}</span>
                         <button className="text-[#dedede] text-sm">...&nbsp;more</button>
                     </div>
                     <div className="w-3/4 flex text-xs items-center gap-2">
@@ -132,7 +218,7 @@ const ReelsCard: React.FC<ReelsCardProps> = ({ url, audioPlaying, setAudioPlayin
                         <span className="truncate">Space Song Beach House</span>
                         <span className="flex items-center gap-2">
                             <IoPerson />
-                            sonustark12
+                            {reel.post.user.userName}
                         </span>
                     </div>
                 </div>

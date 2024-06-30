@@ -79,3 +79,46 @@ export interface FollowerUserType {
     userName: string;
   };
 }
+
+export interface ReelType {
+  id: string;
+  postId: string;
+  url: string;
+  index: number;
+  type: string;
+  createdAt: Date;
+  updatedAt: Date;
+  post: ReelPost;
+}
+
+interface ReelPost {
+  id: string;
+  userId: string;
+  description: string;
+  likesCount: number;
+  commentCount: number;
+  viewsCount: number;
+  postUrlCount: number;
+  typeOfPost: string;
+  isCommentEnable: boolean;
+  isLikeVisible: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  user: ReelUser;
+}
+
+interface ReelUser {
+  id: string;
+  userName: string;
+  name: string;
+  email: string;
+  password: string;
+  imageUrl: string;
+  bio: string;
+  followerCount: number;
+  followingCount: number;
+  postsCount: number;
+  profileType: string;
+  createdAt: Date;
+  updatedAt: Date;
+}

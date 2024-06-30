@@ -9,12 +9,16 @@ const ExplorePage = () => {
     const gridParentRef = useRef<HTMLDivElement | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [page, setPage] = useState<number>(1);
-
+    const [fetchedPages, setFetchedPages] = useState<Set<number>>(new Set());
     const [groupedImages, setGroupedImages] = useState<PostType[][]>([]);
 
     const fetchImages = useCallback(async () => {
         try {
             setLoading(true);
+            if (fetchedPages.has(page)) {
+                console.log(`Page ${page} has already been fetched.`);
+                return; // Exit the function if the page has already been fetched
+            }
             const fetchingRecentPostsResponse = await axios.get(
                 `http://localhost:4000/api/recommend/recentPosts?page=${page}`
             );
@@ -27,7 +31,10 @@ const ExplorePage = () => {
                 } else if (recentPosts10.length >= 5) {
                     const part1 = recentPosts10.slice(0, 5);
                     setGroupedImages((prev) => ([...prev, part1]));
+                }else{
+                    setPage((prev)=>(prev > 1 ? prev-1 : prev ));
                 }
+                setFetchedPages((prev) => new Set(prev).add(page));
             }
 
             // setGroupedImages(
@@ -45,9 +52,10 @@ const ExplorePage = () => {
         } finally {
             setLoading(false);
         }
-    }, [page]);
+    }, [page, fetchedPages]);
 
     useEffect(() => {
+        console.log('Component mounted, fetching posts');
         fetchImages();
     }, [fetchImages]);
 
