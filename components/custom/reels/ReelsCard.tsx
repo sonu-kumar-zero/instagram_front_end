@@ -16,29 +16,11 @@ interface VideoFrameProps {
 }
 
 const VideoFrame: React.FC<VideoFrameProps> = ({ url, videoPlaying, audioPlaying }) => {
-    // const videoRef = useRef<HTMLVideoElement>(null);
-
-    // useEffect(() => {
-    //     const video = videoRef.current;
-    //     if (!video) return;
-    //     videoPlaying ? video.play() : video.pause();
-    // }, [videoPlaying]);
 
     return (
         <>
             <div className="min-w-[50dvh] max-w-[52dvh] h-[90dvh]">
                 {
-                    // videoPlaying &&
-                    // <video
-                    //     ref={videoRef}
-                    //     width="100%"
-                    //     height="90dvh"
-                    //     preload="auto"
-                    //     className="h-[90dvh]"
-                    //     data-setup="{}"
-                    // >
-                    //     <source src={url} type="application/x-mpegURL" />
-                    // </video>
                     <ReactPlayer
                         url={url}
                         playing={videoPlaying}
@@ -75,7 +57,6 @@ const ReelsCard: React.FC<ReelsCardProps> = ({ audioPlaying, setAudioPlaying, re
     const handleVidoSwitchOnAndOff = (e: React.MouseEvent<HTMLDivElement>) => {
         const target = e.target as HTMLElement;
         if (target?.classList.contains("video_overlay_layer")) {
-            // videoPlaying ? videoRef.current?.pause() : videoRef.current?.play();
             setVideoPlaying((prev) => !prev);
         }
     }
@@ -106,39 +87,6 @@ const ReelsCard: React.FC<ReelsCardProps> = ({ audioPlaying, setAudioPlaying, re
         };
     }, []);
 
-    // useEffect(() => {
-    //     const video = videoRef.current;
-    //     if (!video) return;
-
-    //     const handleIntersection = (entries: IntersectionObserverEntry[]) => {
-    //         entries.forEach(entry => {
-    //             if (entry.isIntersecting) {
-    //                 if (!videoPlaying) {
-    //                     setVideoPlaying(true);
-    //                 }
-    //             } else {
-    //                 setVideoPlaying(false);
-    //             }
-    //         });
-    //     };
-
-    //     const observer = new IntersectionObserver(handleIntersection, {
-    //         root: null,
-    //         threshold: 0.5,
-    //     });
-
-    //     observer.observe(video);
-
-    //     return () => {
-    //         observer.disconnect();
-    //     };
-
-    // }, [reel, videoPlaying]);
-
-    // useEffect(() => {
-    //     if (videoRef.current)
-    //         videoRef.current.muted = audioPlaying;
-    // }, [videoRef, audioPlaying]);
 
     return <>
         <div className="h-[90dvh] w-fit relative rounded-xl snap-center">
@@ -150,31 +98,30 @@ const ReelsCard: React.FC<ReelsCardProps> = ({ audioPlaying, setAudioPlaying, re
                         audioPlaying={audioPlaying} />
                 }
             </div>
-            {/* <video src={url} className="" ref={videoRef} /> */}
 
             {/* thumbnail component */}
-            <Image src={`http://127.0.0.1:8000/uploads/thumbnails/${reel.url}/1080_1920.jpg`} className="w-full h-full absolute top-0 left-0 blur-[12px] -z-10" width={1080} height={1920} alt="blur_post_thumbnail" />
+            <Image src={`http://127.0.0.1:8000/uploads/thumbnails/${reel.url}/1080_1920.jpg`} className="w-full h-full absolute top-0 left-0 blur-[16px] -z-10 brightness-80" width={1080} height={1920} alt="blur_post_thumbnail" />
 
             {/* extra feauture buttons */}
             <div className="flex flex-col gap-6 absolute bottom-0 -right-14 items-center text-xl">
                 <button className="flex flex-col items-center">
-                    <FaRegHeart />
+                    <FaRegHeart size={28} />
                     <span className="text-xs">{reel.post.likesCount}</span>
                 </button>
                 <button className="flex flex-col items-center">
-                    <RiMessengerLine />
+                    <RiMessengerLine size={32} />
                     <span className="text-xs">{reel.post.commentCount}</span>
                 </button>
                 <button>
-                    <FiSend />
+                    <FiSend size={28} />
                 </button>
                 <button>
-                    <FaRegBookmark />
+                    <FaRegBookmark size={28} />
                 </button>
                 <button>
-                    <IoEllipsisHorizontal />
+                    <IoEllipsisHorizontal size={28} />
                 </button>
-                <Image src={`http://127.0.0.1:8000/uploads/profile/${reel.post.user.imageUrl}/300_300.jpg`} width={30} height={30} alt="music_icon" className="w-[30px] h-[30px] rounded object-cover" />
+                <Image src={`http://127.0.0.1:8000/uploads/profile/${reel.post.user.imageUrl}/100_100.jpg`} width={30} height={30} alt="music_icon" className="w-[30px] h-[30px] rounded object-cover" />
             </div>
 
             {/* video overlay layer */}
@@ -204,7 +151,7 @@ const ReelsCard: React.FC<ReelsCardProps> = ({ audioPlaying, setAudioPlaying, re
                 }
                 <div className="w-full flex flex-col gap-3 p-3">
                     <div className="flex gap-3 items-center">
-                        <Image src={`http://127.0.0.1:8000/uploads/profile/${reel.post.user.imageUrl}/300_300.jpg`} className="w-[40px] h-[40px] rounded-full" width={40} height={40} alt="user_profile_img" />
+                        <Image src={`http://127.0.0.1:8000/uploads/profile/${reel.post.user.imageUrl}/100_100.jpg`} className="w-[40px] h-[40px] rounded-full" width={40} height={40} alt="user_profile_img" />
                         <span className=" text-sm">{reel.post.user.userName}</span>
                         <span>•</span>
                         <button className="border border-[#dedede] border-opacity-20 rounded-xl hover:from-pink-500 hover:to-yellow-500 px-2 hover:bg-gradient-to-r">Follow</button>
